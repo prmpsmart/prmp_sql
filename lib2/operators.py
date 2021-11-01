@@ -12,15 +12,17 @@ class Operators(Base):
 
         self.operator = operator
         self.first = first
-        self.second = f"'{second}'" if isinstance(second, str) else second
+        self.second = second
 
     def __str__(self) -> str:
         ln = [bool(self.first), bool(self.second)].count(True)
         text = ""
 
         if ln == 1:
-            if self.LTR: text = f"{self.operator} {self.first}"
-            else: text = f"{self.first} {self.operator}"
+            if self.LTR:
+                text = f"{self.operator} {self.first}"
+            else:
+                text = f"{self.first} {self.operator}"
         elif ln == 2:
             text = f"{self.first} {self.operator} {self.second}"
 
@@ -87,7 +89,7 @@ class Name_Operators(Operators):
     parenthesis = False
 
     def __init__(self, first, second=None) -> None:
-        super().__init__(self.name.replace('_', ' '), first, second=second)
+        super().__init__(self.name.replace("_", " "), first, second=second)
 
 
 class AS(Name_Operators):
@@ -108,12 +110,16 @@ class BETWEEN(Name_Operators):
         text = super().__str__()
         return f"{text} AND {self.third}"
 
+
 class ESCAPE(Name_Operators):
     def __init__(self, first) -> None:
-        assert isinstance(first, str) and (len(first) == 1), 'ESCAPE character must be a a char like [s, t, etc]'
+        assert isinstance(first, str) and (
+            len(first) == 1
+        ), "ESCAPE character must be a a char like [s, t, etc]"
         first = f"'{first}'"
 
         super().__init__(first)
+
 
 class LIKE(Name_Operators):
     WILDCARDS = ["%", "_", "[*...]", "[^...]", "[!...]"]
@@ -124,12 +130,14 @@ class LIKE(Name_Operators):
         ), "second value must be a string containing wildcards"
 
         super().__init__(first, second=second)
-        if isinstance(escape, str): escape = ESCAPE(escape)
+        if isinstance(escape, str):
+            escape = ESCAPE(escape)
         self.escape = escape
-    
+
     def __str__(self) -> str:
         text = super().__str__()
-        if self.escape: text = f'{text} {self.escape}'
+        if self.escape:
+            text = f"{text} {self.escape}"
         return text
 
 
@@ -159,9 +167,11 @@ class DISTINCT(Name_Operators):
 class Name_Operators_F(Name_Operators):
     LTR = False
 
+
 class IS_NULL(Name_Operators_F):
     def __init__(self, first) -> None:
         super().__init__(first)
+
 
 class IS_NOT_NULL(Name_Operators_F):
     def __init__(self, first) -> None:
