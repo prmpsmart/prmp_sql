@@ -1,4 +1,6 @@
 from typing import Tuple
+
+from .statements import SELECT
 from .bases import *
 
 
@@ -7,8 +9,12 @@ class Operators(Base):
     LTR = True
 
     def __init__(self, operator, first, second=None) -> None:
-        assert operator, "Operator value can not be [None, Empty string, 0]"
-        assert first, "First value can not be [None, Empty string, 0]"
+        """
+        :operator: Operator value can not be [None, 0]
+        :first: First value can not be [None, Empty string, 0]
+        """
+        if isinstance(second, SELECT):
+            second.parenthesis = True
 
         self.operator = operator
         self.first = first
@@ -86,15 +92,19 @@ class LESS_THAN_EQUAL(Operators):
 
 
 class Name_Operators(Operators):
-    parenthesis = False
-
     def __init__(self, first, second=None) -> None:
         super().__init__(self.name.replace("_", " "), first, second=second)
 
 
 class AS(Name_Operators):
-    def __init__(self, first, second) -> None:
+    def __init__(self, first, second, hide=False) -> None:
         super().__init__(first, second=second)
+        if hide:
+            self.operator = ""
+            self.parenthesis = False
+    
+    def __str__(self) -> str:
+        return super().__str__().replace('  ',  ' ')
 
 
 class BETWEEN(Name_Operators):
@@ -102,7 +112,6 @@ class BETWEEN(Name_Operators):
         assert type(second) == type(
             third
         ), "second and third value must be of same data_type"
-
         super().__init__(first, second=second)
         self.third = third
 
@@ -143,14 +152,20 @@ class LIKE(Name_Operators):
 
 class IN(Name_Operators):
     def __init__(self, first, second: Tuple) -> None:
-        assert isinstance(second, tuple)
-
+        assert isinstance(second, (tuple, SELECT))
         super().__init__(first, second=second)
 
 
 class AND(Name_Operators):
     def __init__(self, first, second) -> None:
         super().__init__(first, second=second)
+
+
+class NOT(Name_Operators):
+    parenthesis = False
+
+    def __init__(self, first) -> None:
+        super().__init__(first)
 
 
 class OR(Name_Operators):
@@ -160,12 +175,13 @@ class OR(Name_Operators):
 
 class DISTINCT(Name_Operators):
     def __init__(self, first) -> None:
-        assert isinstance(first, (str, Column, Columns))
+        assert isinstance(first, (str, Columns))
         super().__init__(first)
 
 
 class Name_Operators_F(Name_Operators):
     LTR = False
+    parenthesis = False
 
 
 class IS_NULL(Name_Operators_F):
@@ -176,3 +192,32 @@ class IS_NULL(Name_Operators_F):
 class IS_NOT_NULL(Name_Operators_F):
     def __init__(self, first) -> None:
         super().__init__(first)
+
+
+class ASC(Name_Operators_F):
+    def __init__(self, first) -> None:
+        super().__init__(first)
+
+
+class DESC(Name_Operators_F):
+    def __init__(self, first) -> None:
+        super().__init__(first)
+
+
+class SET(Name_Operators):
+    parenthesis = False
+
+    def __init__(self, first, second) -> None:
+        if isinstance(first, UNION) and not isinstance(second, UNION):
+            first, second = second, first
+
+        for u in (first, second):
+            if isinstance(u, UNION):
+                u.parenthesis = True
+        super().__init__(first, second=second)
+
+class UNION(Name_Operators):
+    ...
+
+class UNION_ALL(UNION):
+    ...

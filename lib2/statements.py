@@ -1,8 +1,12 @@
-from .bases import Base
+from .functions import Function
+from .clauses import FROM, GROUP_BY, HAVING, ORDER_BY, WHERE
+from .bases import Base, Columns
 
 
 class SELECT(Base):
+
     DESCRIPTION = ""
+    parenthesis = False
 
     def __init__(
         self,
@@ -19,11 +23,28 @@ class SELECT(Base):
         """
         :columns: instance of Columns|Column
         :from_: instance of FROM
+        :where: instance of WHERE
         :group: instance of GROUP
         :having: instance of HAVING
         :order: instance of ORDER
         :into: instance of INTO_TABLE
         """
+        if columns:
+            assert isinstance(
+                columns, (str, Columns, Function)
+            ), f"type ({str}, {Columns}, {Function}) is expected not {type(columns)}."
+        if from_:
+            assert isinstance(from_, FROM)
+        if where:
+            assert isinstance(where, WHERE)
+        if group:
+            assert isinstance(group, GROUP_BY)
+        if having:
+            assert isinstance(having, HAVING)
+        if order:
+            assert isinstance(order, ORDER_BY)
+        # assert isinstance(into, (str, INTO_TABLE))
+
         self.columns = columns
         self.from_ = from_
         self.where = where
@@ -52,6 +73,9 @@ class SELECT(Base):
             default += f" {self.having}"
         if self.order:
             default += f" {self.order}"
+
+        if self.parenthesis:
+            default = f"({default})"
 
         return default
 

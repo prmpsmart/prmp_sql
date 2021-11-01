@@ -134,13 +134,15 @@ class XML(Data_Type):
     # (type modifier [secondary type modifier]) :
     DESCRIPTION = "Character data formatted as Extensible Markup Language (XML)"
 
-class CONSTANT:
 
+class CONSTANT:
     def __init__(self, value) -> None:
         valid = (str, int, float)
-        assert isinstance(value, valid), f'value must be of type {valid}'
-        if isinstance(value, (int, float)): self.value = value
-        elif isinstance(value, str): self.value = f"'{value}'"
-    
+        assert isinstance(value, valid), f"value must be of type {valid}"
+        if isinstance(value, (int, float)):
+            self.value = value
+        elif isinstance(value, str):
+            self.value = f"'{value}'"
+
     def __str__(self) -> str:
         return self.value

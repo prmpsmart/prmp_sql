@@ -1,4 +1,4 @@
-from .bases import Base
+from .bases import Base, Columns
 
 
 class Clause(Base):
@@ -6,7 +6,7 @@ class Clause(Base):
         self.expression = expression
 
     def __str__(self) -> str:
-        name = self.name
+        name = self.name.replace("_", " ")
         if self.expression:
             name += f" {self.expression}"
         return name
@@ -33,5 +33,7 @@ class HAVING(Clause):
 
 
 class ORDER_BY(Clause):
-    def __init__(self, sort_specification) -> None:
-        super().__init__(sort_specification)
+    def __init__(self, *columns: Columns) -> None:
+        if not isinstance(columns, Columns):
+            columns = Columns(*columns)
+        super().__init__(columns)
