@@ -102,9 +102,9 @@ class AS(Name_Operators):
         if hide:
             self.operator = ""
             self.parenthesis = False
-    
+
     def __str__(self) -> str:
-        return super().__str__().replace('  ',  ' ')
+        return super().__str__().replace("  ", " ")
 
 
 class BETWEEN(Name_Operators):
@@ -208,16 +208,60 @@ class SET(Name_Operators):
     parenthesis = False
 
     def __init__(self, first, second) -> None:
+        super().__init__(first, second=second)
+
+
+class UNION(SET):
+    def __init__(self, first, second) -> None:
         if isinstance(first, UNION) and not isinstance(second, UNION):
             first, second = second, first
 
         for u in (first, second):
             if isinstance(u, UNION):
                 u.parenthesis = True
-        super().__init__(first, second=second)
+        super().__init__(first, second)
 
-class UNION(Name_Operators):
-    ...
 
 class UNION_ALL(UNION):
+    ...
+
+
+class INTERSET(SET):
+    ...
+
+
+class EXCEPT(SET):
+    "Also called MINUS"
+    ...
+
+
+class JOIN(SET):
+    ...
+
+
+class INNER_JOIN(JOIN):
+    ...
+
+
+class LEFT_JOIN(JOIN):
+    ...
+
+
+class RIGHT_JOIN(JOIN):
+    ...
+
+
+class FULL_JOIN(JOIN):
+    ...
+
+
+class FULL_OUTER_JOIN(FULL_JOIN):
+    ...
+
+
+class CROSS_JOIN(JOIN):
+    ...
+
+
+class NATURAL_JOIN(JOIN):
     ...
