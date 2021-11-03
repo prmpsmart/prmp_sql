@@ -27,7 +27,7 @@ class SELECT(Base):
         :group: instance of GROUP
         :having: instance of HAVING
         :order: instance of ORDER
-        :into: instance of INTO_TABLE
+        :into: instance of INTO
         """
         if columns:
             assert isinstance(
@@ -80,6 +80,44 @@ class SELECT(Base):
         return default
 
 
+class INSERT(Base):
+    def __init__(self, into, values, columns="", where=None) -> None:
+        self.into = into
+        self.values = values
+        self.columns = columns
+        self.where = where
+
+    def __str__(self) -> str:
+        text = f"{self.name} {self.into}"
+        if self.columns:
+            text += f" {self.columns}"
+        text += f" {self.values}"
+        if self.where:
+            text += f" {self.where}"
+
+        return text
+
+
+class UPDATE(Base):
+    def __init__(self, table, set, where=None) -> None:
+        self.table = table
+        self.set = set
+        self.where = where
+
+    def __str__(self) -> str:
+        text = f"{self.name} {self.table} {self.set}"
+        if self.where:
+            text += f" {self.where}"
+        return text
+
+
 class DELETE(Base):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, table, where=None) -> None:
+        self.table = table
+        self.where = where
+
+    def __str__(self) -> str:
+        text = f"{self.name} FROM {self.table}"
+        if self.where:
+            text += f" {self.where}"
+        return text

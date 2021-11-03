@@ -1,7 +1,7 @@
-from .bases import Base
+from .bases import Name_Space_Base, Base
 
 
-class Data_Type(Base):
+class Data_Type(Name_Space_Base):
     ABBRS = []
     DESCRIPTION = ""
     MODIFIERS = []
@@ -16,10 +16,6 @@ class Data_Type(Base):
         self.column = column
         self.first = first
         self.second = second
-
-    @property
-    def name(self):
-        return super().name.replace("_", " ")
 
     def __str__(self):
         text = f"{self.column} {self.name}"
@@ -135,7 +131,7 @@ class XML(Data_Type):
     DESCRIPTION = "Character data formatted as Extensible Markup Language (XML)"
 
 
-class CONSTANT:
+class CONSTANT(Base):
     def __init__(self, value) -> None:
         valid = (str, int, float)
         assert isinstance(value, valid), f"value must be of type {valid}"

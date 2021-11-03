@@ -1,12 +1,13 @@
-from .bases import Base, Columns
+from .operators import EQUAL
+from .bases import Name_Space_Base, Columns
 
 
-class Clause(Base):
+class Clause(Name_Space_Base):
     def __init__(self, expression) -> None:
         self.expression = expression
 
     def __str__(self) -> str:
-        name = self.name.replace("_", " ")
+        name = self.name
         if self.expression:
             name += f" {self.expression}"
         return name
@@ -37,3 +38,16 @@ class ORDER_BY(Clause):
         if not isinstance(columns, Columns):
             columns = Columns(*columns)
         super().__init__(columns)
+
+
+class SET(Clause):
+    def __init__(self, first, second) -> None:
+        from .datatypes import CONSTANT
+
+        if not isinstance(second, CONSTANT):
+            second = CONSTANT(second)
+
+        expression = EQUAL(first, second)
+        expression.parenthesis = False
+
+        super().__init__(expression)

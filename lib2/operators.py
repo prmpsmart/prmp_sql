@@ -1,6 +1,5 @@
 from typing import Tuple
 
-from .statements import SELECT
 from .bases import *
 
 
@@ -13,6 +12,8 @@ class Operators(Base):
         :operator: Operator value can not be [None, 0]
         :first: First value can not be [None, Empty string, 0]
         """
+        from .statements import SELECT
+
         if isinstance(second, SELECT):
             second.parenthesis = True
 
@@ -152,6 +153,8 @@ class LIKE(Name_Operators):
 
 class IN(Name_Operators):
     def __init__(self, first, second: Tuple) -> None:
+        from .statements import SELECT
+
         assert isinstance(second, (tuple, SELECT))
         super().__init__(first, second=second)
 
@@ -166,6 +169,10 @@ class NOT(Name_Operators):
 
     def __init__(self, first) -> None:
         super().__init__(first)
+
+
+class INTO(NOT):
+    ...
 
 
 class OR(Name_Operators):
@@ -204,14 +211,14 @@ class DESC(Name_Operators_F):
         super().__init__(first)
 
 
-class SET(Name_Operators):
+class _SET(Name_Operators):
     parenthesis = False
 
     def __init__(self, first, second) -> None:
         super().__init__(first, second=second)
 
 
-class UNION(SET):
+class UNION(_SET):
     def __init__(self, first, second) -> None:
         if isinstance(first, UNION) and not isinstance(second, UNION):
             first, second = second, first
@@ -226,16 +233,16 @@ class UNION_ALL(UNION):
     ...
 
 
-class INTERSET(SET):
+class INTERSET(_SET):
     ...
 
 
-class EXCEPT(SET):
+class EXCEPT(_SET):
     "Also called MINUS"
     ...
 
 
-class JOIN(SET):
+class JOIN(_SET):
     ...
 
 
