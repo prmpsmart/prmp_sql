@@ -3,7 +3,7 @@ from .bases import Name_Space_Base, Columns
 
 
 class Clause(Name_Space_Base):
-    def __init__(self, expression) -> None:
+    def __init__(self, expression=None) -> None:
         self.expression = expression
 
     def __str__(self) -> str:
@@ -41,13 +41,41 @@ class ORDER_BY(Clause):
 
 
 class SET(Clause):
-    def __init__(self, first, second) -> None:
-        from .datatypes import CONSTANT
+    def __init__(self, *values) -> None:
+        expression = None
+        l = len(values)
+        if l:
+            ll = [type(value) for value in values]
+            if Columns in ll:
+                assert l == 1, "Only one Columns object should be parsed."
+                expression = values[0]
+            else:
+                columns = []
+                for value in values:
+                    equal = None
+                    if isinstance(value, (tuple, list)):
+                        assert (
+                            len(value) == 2
+                        ), "Tuple or List must be of len 2, (column_name1, value1) i.e column_name1 = value1"
+                        equal = EQUAL(*value)
+                    elif isinstance(value, EQUAL):
+                        equal = value
 
-        if not isinstance(second, CONSTANT):
-            second = CONSTANT(second)
+                    equal.parenthesis = False
+                    columns.append(equal)
 
-        expression = EQUAL(first, second)
-        expression.parenthesis = False
+                expression = Columns(*columns)
 
         super().__init__(expression)
+
+
+class INDEX(Clause):
+    def __init__(self, expression) -> None:
+        super().__init__(expression)
+
+    def __str__(self) -> str:
+        return f"{self.name} {self.expression}"
+
+
+class UNIQUE_INDEX(INDEX):
+    ...

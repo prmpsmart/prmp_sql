@@ -5,6 +5,9 @@ class Base:
     def name(self):
         return self.__class__.__name__
 
+    def debug(self):
+        print(self)
+
 
 class Name_Space_Base(Base):
     @property

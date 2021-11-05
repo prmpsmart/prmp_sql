@@ -21,11 +21,20 @@ a = INSERT(
 )
 a = UPDATE(
     "Atrists",
-    SET("ArtistName", "The Artist Formerly Known as Prince"),
+    SET(
+        ("ArtistName", CONSTANT("The Artist Formerly Known as Prince")),
+        ("Formerly", CONSTANT("Known as Prince")),
+    ),
     WHERE(EQUAL("ArtistName", CONSTANT("Prince"))),
 )
-a = DELETE(Table('Artists'), WHERE (EQUAL('ArtistId', CONSTANT('6'))))
-print(a)
+a = DELETE(Table("Artists"), WHERE(EQUAL("ArtistId", CONSTANT("6"))))
+a = TRUNCATE("Artists")
+a = CREATE(UNIQUE_INDEX(ON("index_name", "table_name", Columns("column1", "column2"))))
+a = ALTER_DATABASE(COLLATE("Movies", "utf8_unicode_ci"))
+a = DROP_DATABASE("Movies")
+a = CREATE_TABLE("Actors", New_Columns("love", "boys"))
+
+a.debug()
 
 # import os
 # f = r'C:\Users\Administrator\Downloads\PRMP SQL'

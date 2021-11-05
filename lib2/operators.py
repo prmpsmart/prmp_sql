@@ -39,54 +39,64 @@ class Operators(Base):
         return text
 
 
-class MINUS(Operators):
+class Two_Values(Operators):
+    sign = ""
+
     def __init__(self, first, second) -> None:
-        super().__init__("-", first, second=second)
+        super().__init__(self.sign, first, second=second)
 
 
-class PLUS(Operators):
-    def __init__(self, first, second) -> None:
-        super().__init__("+", first, second=second)
+class MINUS(Two_Values):
+    sign = "-"
 
 
-class MULTIPLY(Operators):
-    def __init__(self, first, second) -> None:
-        super().__init__("*", first, second=second)
+class PLUS(Two_Values):
+    sign = "+"
 
 
-class DIVIDE(Operators):
-    def __init__(self, first, second) -> None:
-        super().__init__("/", first, second=second)
+class MULTIPLY(Two_Values):
+    sign = "*"
 
 
-class EQUAL(Operators):
-    def __init__(self, first, second) -> None:
-        super().__init__("=", first, second=second)
+class DIVIDE(Two_Values):
+    sign = "/"
 
 
-class NOT_EQUAL(Operators):
-    def __init__(self, first, second) -> None:
-        super().__init__("<>", first, second=second)
+class MODULO(Two_Values):
+    sign = "%"
 
 
-class GREATER_THAN(Operators):
-    def __init__(self, first, second) -> None:
-        super().__init__(">", first, second=second)
+class EQUAL(Two_Values):
+    sign = "="
 
 
-class LESS_THAN(Operators):
-    def __init__(self, first, second) -> None:
-        super().__init__("<", first, second=second)
+class NOT_EQUAL(Two_Values):
+    OPERATORS = ["!=", "<>"]
+    sign = "<>"
 
 
-class GREATER_THAN_EQUAL(Operators):
-    def __init__(self, first, second) -> None:
-        super().__init__(">=", first, second=second)
+class GREATER_THAN(Two_Values):
+    sign = ">"
 
 
-class LESS_THAN_EQUAL(Operators):
-    def __init__(self, first, second) -> None:
-        super().__init__("<=", first, second=second)
+class LESS_THAN(Two_Values):
+    sign = "<"
+
+
+class NOT_GREATER_THAN(Two_Values):
+    sign = "!>"
+
+
+class NOT_LESS_THAN(Two_Values):
+    sign = "!<"
+
+
+class GREATER_THAN_EQUAL(Two_Values):
+    sign = ">="
+
+
+class LESS_THAN_EQUAL(Two_Values):
+    sign = "<="
 
 
 # ---------------------------------------------------
@@ -107,6 +117,7 @@ class AS(Name_Operators):
     def __str__(self) -> str:
         return super().__str__().replace("  ", " ")
 
+class TO(AS): ...
 
 class BETWEEN(Name_Operators):
     def __init__(self, first, second, third) -> None:
@@ -159,6 +170,10 @@ class IN(Name_Operators):
         super().__init__(first, second=second)
 
 
+class EXISTS(IN):
+    ...
+
+
 class AND(Name_Operators):
     def __init__(self, first, second) -> None:
         super().__init__(first, second=second)
@@ -186,6 +201,13 @@ class DISTINCT(Name_Operators):
         super().__init__(first)
 
 
+class COLLATE(Name_Operators):
+    parenthesis = False
+
+    def __init__(self, first, second) -> None:
+        super().__init__(first, second)
+
+
 class Name_Operators_F(Name_Operators):
     LTR = False
     parenthesis = False
@@ -209,6 +231,19 @@ class ASC(Name_Operators_F):
 class DESC(Name_Operators_F):
     def __init__(self, first) -> None:
         super().__init__(first)
+
+
+class ON(Name_Operators_F):
+    def __init__(self, first, second, third) -> None:
+        super().__init__(first, second=second)
+        assert isinstance(third, (tuple, Columns))
+        if isinstance(third, Columns):
+            third.parenthesis = True
+        self.third = third
+
+    def __str__(self) -> str:
+        text = super().__str__()
+        return f"{text} {self.third}"
 
 
 class _SET(Name_Operators):

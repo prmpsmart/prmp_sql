@@ -1,6 +1,7 @@
 from .functions import Function
-from .clauses import FROM, GROUP_BY, HAVING, ORDER_BY, WHERE
-from .bases import Base, Columns
+from .clauses import FROM, GROUP_BY, HAVING, ORDER_BY, WHERE, Clause
+from .bases import Base, Column, Columns
+from .operators import AS, TO
 
 
 class SELECT(Base):
@@ -121,3 +122,155 @@ class DELETE(Base):
         if self.where:
             text += f" {self.where}"
         return text
+
+
+class One_Line(Clause):
+    def __init__(self, expression) -> None:
+        self.expression = expression
+
+    def __str__(self) -> str:
+        return f"{self.name} {self.expression}"
+
+
+class TRUNCATE(One_Line):
+    ...
+
+
+class New_Column:
+    def __init__(self, name, tags=[]) -> None:
+        self.name = name
+        self.tags = tags
+
+    def __str__(self) -> str:
+        text = self.name
+
+        for a in self.tags:
+            text += f" {a}"
+
+        return text
+
+
+NC = New_Column
+
+
+class New_Columns(Columns):
+    def __init__(self, *args) -> None:
+        """
+        :args: instances of New_Column or tuples containing the parameters of a New_Column class
+        """
+        columns = []
+        for arg in args:
+            val = None
+            if isinstance(arg, (str, New_Column)):
+                val = arg
+            elif isinstance(arg, tuple):
+                val = New_Column(arg[0], arg[1])
+            else:
+                raise "args must be instances of New_Column or tuples containing the parameters of a New_Column class"
+
+            if val:
+                columns.append(val)
+
+        super().__init__(*columns, parenthesis=True)
+
+
+NCs = New_Columns
+
+
+class CREATE(One_Line):
+    def __init__(self, expression) -> None:
+        super().__init__(expression)
+
+
+class CREATE_TABLE(CREATE):
+    def __init__(self, table, new_columns) -> None:
+        assert isinstance(new_columns, New_Columns)
+        expression = f"{table} {new_columns}"
+        super().__init__(expression)
+
+
+class CREATE_DATABASE(CREATE):
+    ...
+
+
+class CREATE_VIEW(CREATE):
+    def __init__(self, view, select) -> None:
+        assert isinstance(select, SELECT), f"select must be an instance of {SELECT}"
+        expression = AS(view, select)
+        super().__init__(expression)
+
+
+class Modifier(Base):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def __str__(self) -> str:
+        return super().__str__()
+
+
+class ADD_COLUMN(One_Line):
+    def __init__(self, *values) -> None:
+        """
+        :values: value in values can be a [str, Column, tuple, list].
+        when value is a tuple or list, it must be of length 2, (column_name, datatype)
+        """
+        expression = None
+
+        l = len(values)
+        if l:
+            ll = [type(value) for value in values]
+            if Columns in ll:
+                assert l == 1, "Only one Columns object should be parsed."
+                expression = values[0]
+        else:
+            columns = []
+            for value in values:
+                col = None
+                if isinstance(value, (str, Column)):
+                    col = value
+
+                elif isinstance(value, (tuple, list)):
+                    assert len(value) == 2, "Length of Tuple or List must be 2."
+                    col = New_Column(value[0], tags=[value[1]])
+
+                else:
+                    raise Exception("Value not supported.")
+
+                columns.append(col)
+
+                expression = New_Columns(*columns)
+
+        super().__init__(expression)
+
+
+class ALTER_TABLE(One_Line):
+    # TODO
+    def __init__(self, table, modifier) -> None:
+        expression = f"{table} {modifier}"
+        super().__init__(expression)
+
+
+class ALTER_DATABASE(One_Line):
+    ...
+
+
+class DROP_DATABASE(One_Line):
+    ...
+
+
+class DROP_TABLE(One_Line):
+    ...
+
+
+class DROP_VIEW(One_Line):
+    ...
+
+class RENAME(One_Line):...
+
+class RENAME_TABLE(RENAME):
+
+    def __init__(self, expression) -> None:
+        assert isinstance(expression, TO)
+        super().__init__(expression)
+
+...
