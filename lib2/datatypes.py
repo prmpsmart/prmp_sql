@@ -27,97 +27,127 @@ class Data_Type(Name_Space_Base):
         return text
 
 
-class CHARACTER(Data_Type):
+class Just_Name(Data_Type):
+    def __init__(self, name):
+        super().__init__(name)
+
+
+class One_Value(Data_Type):
+    def __init__(self, name, first):
+        super().__init__(name, first)
+
+
+class Two_Value(Data_Type):
+    def __init__(self, name, first, second):
+        super().__init__(name, first, second)
+
+
+class CHARACTER(One_Value):
     ABBRS = ["CHAR"]
     DESCRIPTION = "Fixed-length character strings"
 
 
-class CHARACTER_VARYING(Data_Type):
+class CHAR(CHARACTER):
+    ...
+
+
+class CHARACTER_VARYING(One_Value):
     ABBRS = ["CHAR VARYING", "VARCHAR"]
     DESCRIPTION = "Variable-length character strings"
 
 
-class CHARACTER_LARGE_OBJECT(Data_Type):
+class VARCHAR(CHARACTER_VARYING):
+    ...
+
+
+class CHARACTER_LARGE_OBJECT(One_Value):
     ABBRS = ["CLOB"]
     DESCRIPTION = "Large fixed-length character strings"
 
 
-class NATIONAL_CHARACTER(Data_Type):
+class CLOB(CHARACTER_LARGE_OBJECT):
+    ...
+
+
+class NATIONAL_CHARACTER(One_Value):
     ABBRS = "NATIONAL CHAR", "NCHAR"
     DESCRIPTION = "Fixed-length national character strings"
 
 
-class NATIONAL_CHARACTER_VARYING(Data_Type):
+class NATIONAL_CHARACTER_VARYING(One_Value):
     ABBRS = "NATIONAL CHAR VARYING", "NCHAR"
     DESCRIPTION = "Variable-length national character strings"
 
 
-class NATIONAL_CHARACTER_LARGE_OBJECT(Data_Type):
+class NATIONAL_CHARACTER_LARGE_OBJECT(One_Value):
     ABBRS = ["NCLOB"]
     DESCRIPTION = "Large variable-length national character strings"
 
 
-class BIT(Data_Type):
+class BIT(One_Value):
     DESCRIPTION = "Fixed-length bit strings"
 
 
-class BIT_VARYING(Data_Type):
+class BIT_VARYING(One_Value):
     DESCRIPTION = "Variable-length bit strings"
 
 
-class INTEGER(Data_Type):
+class INTEGER(Just_Name):
     ABBRS = ["INT"]
     DESCRIPTION = "Integers"
 
 
-class SMALLINT(Data_Type):
+INT = INTEGER
+
+
+class SMALLINT(Just_Name):
     DESCRIPTION = "Small integers"
 
 
-class NUMERIC(Data_Type):
+class NUMERIC(Two_Value):
     FUNCTIONAL_ARGS = [float, int]
     DESCRIPTION = "Decimal numbers"
 
 
-class DECIMAL(Data_Type):
+class DECIMAL(Two_Value):
     ABBRS = ["DEC"]
     FUNCTIONAL_ARGS = [float, int]
     DESCRIPTION = "Decimal numbers"
 
 
-class FLOAT(Data_Type):
+class FLOAT(One_Value):
     FUNCTIONAL_ARGS = [float]
     DESCRIPTION = "Floating point numbers"
 
 
-class REAL(Data_Type):
+class REAL(Just_Name):
     DESCRIPTION = "Low-precision floating point numbers"
 
 
-class DOUBLE_PRECISION(Data_Type):
+class DOUBLE_PRECISION(Just_Name):
     DESCRIPTION = "High-precision floating point numbers"
 
 
-class DATE(Data_Type):
+class DATE(Just_Name):
     DESCRIPTION = "Calendar dates"
 
 
-class TIME(Data_Type):
+class TIME(One_Value):
     FUNCTIONAL_ARGS = [float]
     DESCRIPTION = "Clock times"
 
 
-class TIME_WITH_TIME_ZONE(Data_Type):
+class TIME_WITH_TIME_ZONE(One_Value):
     FUNCTIONAL_ARGS = [float]
     DESCRIPTION = "Clock times with time zones"
 
 
-class TIMESTAMP(Data_Type):
+class TIMESTAMP(One_Value):
     FUNCTIONAL_ARGS = [float]
     DESCRIPTION = "Dates and times"
 
 
-class TIMESTAMP_WITH_TIME_ZONE(Data_Type):
+class TIMESTAMP_WITH_TIME_ZONE(One_Value):
     FUNCTIONAL_ARGS = [float]
     DESCRIPTION = "Dates and times with time zones"
 

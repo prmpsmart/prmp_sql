@@ -42,6 +42,9 @@ class ORDER_BY(Clause):
 
 class SET(Clause):
     def __init__(self, *values) -> None:
+        """
+        :values: tuple, list of length 2, or instance of EQUAL
+        """
         expression = None
         l = len(values)
         if l:
@@ -58,7 +61,7 @@ class SET(Clause):
                             len(value) == 2
                         ), "Tuple or List must be of len 2, (column_name1, value1) i.e column_name1 = value1"
                         equal = EQUAL(*value)
-                    elif isinstance(value, EQUAL):
+                    elif isinstance(value, (EQUAL, SET)):
                         equal = value
 
                     equal.parenthesis = False

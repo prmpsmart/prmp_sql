@@ -16,21 +16,36 @@ class Function(Base):
         return text
 
 
-class AVG(Function):
+class One_Value(Function):
+    def __init__(self, first) -> None:
+        super().__init__(first)
+
+
+class Two_Value(Function):
+    def __init__(self, first, second) -> None:
+        super().__init__(first, second=second)
+
+
+class AVG(One_Value):
     ...
 
 
-class COUNT(Function):
+class COUNT(One_Value):
     ...
 
 
-class MAX(Function):
+class MAX(One_Value):
     ...
 
 
-class MIN(Function):
+class MIN(One_Value):
     ...
 
 
-class SUM(Function):
+class SUM(One_Value):
     ...
+
+
+class ROUND(Two_Value):
+    def __init__(self, column, integer) -> None:
+        super().__init__(column, integer)

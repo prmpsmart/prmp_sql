@@ -1,4 +1,4 @@
-from .functions import Function
+from .functions import Function, One_Value
 from .clauses import FROM, GROUP_BY, HAVING, ORDER_BY, WHERE, Clause
 from .bases import Base, Column, Columns
 from .operators import AS, TO
@@ -136,13 +136,14 @@ class TRUNCATE(One_Line):
     ...
 
 
-class New_Column:
-    def __init__(self, name, tags=[]) -> None:
-        self.name = name
+class New_Column(Base):
+    def __init__(self, column_name, tags=[]) -> None:
+        self.column_name = column_name
         self.tags = tags
 
     def __str__(self) -> str:
-        text = self.name
+
+        text = f"{self.column_name}"
 
         for a in self.tags:
             text += f" {a}"
@@ -166,7 +167,9 @@ class New_Columns(Columns):
             elif isinstance(arg, tuple):
                 val = New_Column(arg[0], arg[1])
             else:
-                raise "args must be instances of New_Column or tuples containing the parameters of a New_Column class"
+                raise Exception(
+                    "args must be instances of New_Column or tuples containing the parameters of a New_Column class"
+                )
 
             if val:
                 columns.append(val)
@@ -211,22 +214,22 @@ class Modifier(Base):
 class ADD_COLUMN(One_Line):
     def __init__(self, *values) -> None:
         """
-        :values: value in values can be a [str, Column, tuple, list].
+        :values: value in values can be a [str, Column, tuple, list, New_Column].
         when value is a tuple or list, it must be of length 2, (column_name, datatype)
         """
         expression = None
 
-        l = len(values)
-        if l:
+        if values:
+            l = len(values)
             ll = [type(value) for value in values]
-            if Columns in ll:
-                assert l == 1, "Only one Columns object should be parsed."
+            if Columns in ll or New_Columns in ll:
+                assert l == 1, "Only one Columns object should be passed."
                 expression = values[0]
-        else:
+        if not expression:
             columns = []
             for value in values:
                 col = None
-                if isinstance(value, (str, Column)):
+                if isinstance(value, (str, Column, New_Column)):
                     col = value
 
                 elif isinstance(value, (tuple, list)):
@@ -239,6 +242,45 @@ class ADD_COLUMN(One_Line):
                 columns.append(col)
 
                 expression = New_Columns(*columns)
+        if not expression:
+            raise Exception("Expression is not determined")
+
+        super().__init__(expression)
+
+
+class ALTER_COLUMN(ADD_COLUMN):
+    ...
+
+
+class DROP_COLUMN(One_Line):
+    def __init__(self, *values) -> None:
+        """
+        :values: value in values can be a [str, Column, tuple, list, New_Column].
+        when value is a tuple or list, it must be of length 2, (column_name, datatype)
+        """
+        expression = None
+
+        if values:
+            l = len(values)
+            ll = [type(value) for value in values]
+            if Columns in ll:
+                assert l == 1, "Only one Columns object should be passed."
+                expression = values[0]
+        if not expression:
+            columns = []
+            for value in values:
+                col = None
+                if isinstance(value, (str, Column)):
+                    col = value
+
+                else:
+                    raise Exception("Value not supported.")
+
+                columns.append(col)
+
+                expression = Columns(*columns)
+        if not expression:
+            raise Exception("Expression is not determined")
 
         super().__init__(expression)
 
@@ -265,12 +307,17 @@ class DROP_TABLE(One_Line):
 class DROP_VIEW(One_Line):
     ...
 
-class RENAME(One_Line):...
+
+class RENAME(One_Line):
+    ...
+
 
 class RENAME_TABLE(RENAME):
-
     def __init__(self, expression) -> None:
         assert isinstance(expression, TO)
         super().__init__(expression)
 
-...
+
+class WITH(One_Value):
+    def __init__(self, first) -> None:
+        super().__init__(first)

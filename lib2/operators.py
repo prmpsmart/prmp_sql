@@ -117,7 +117,10 @@ class AS(Name_Operators):
     def __str__(self) -> str:
         return super().__str__().replace("  ", " ")
 
-class TO(AS): ...
+
+class TO(AS):
+    ...
+
 
 class BETWEEN(Name_Operators):
     def __init__(self, first, second, third) -> None:
@@ -137,7 +140,17 @@ class ESCAPE(Name_Operators):
         assert isinstance(first, str) and (
             len(first) == 1
         ), "ESCAPE character must be a a char like [s, t, etc]"
-        first = f"'{first}'"
+
+        # first = f"'{first}'"
+        from .datatypes import CONSTANT
+
+        first = CONSTANT(first)
+
+        super().__init__(first)
+
+
+class LIMIT(Name_Operators):
+    def __init__(self, first) -> None:
 
         super().__init__(first)
 
