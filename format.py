@@ -1,8 +1,3 @@
-def format():
-    import os
+import os
 
-    os.system("python -m black .")
-    exit()
-
-
-format()
+os.system(r"python -m black .")

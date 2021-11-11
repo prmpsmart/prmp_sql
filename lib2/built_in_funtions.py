@@ -1,11 +1,10 @@
 from typing import Any, FrozenSet
-from bases import BASE
-from datatypes import Data_Type
-from keywords import KEYWORD
-from keywords.reserved import AS, BOTH, DEC, FOR, FROM, IN, LEADING, TRAILING, USING
+from .bases import Base
+from .datatypes import Data_Type
+from .keywords import KEYWORDS
 
 
-class Built_in_Function(BASE):
+class Built_in_Function(Base):
     def __init__(self, name, args=[], args_ms=[], desc="") -> None:
         self.ARGS = args
         self.DESCRIPTION = desc
@@ -40,7 +39,7 @@ BIT_LENGTH = (Built_in_Function)(
 CAST = (Built_in_Function)(
     "CAST",
     args=[object, Data_Type],
-    args_ms=[AS],
+    args_ms=[KEYWORDS.AS],
     desc="The value, converted to the specified data type (e.g., a date converted to a character string)",
 )
 
@@ -51,7 +50,7 @@ CHAR_LENGTH = (Built_in_Function)(
 CONVERT = (Built_in_Function)(
     "CONVERT",
     args=[str, function],
-    args_ms=[USING],
+    args_ms=[KEYWORDS.USING],
     desc="A string converted as specified by a named conversion function",
 )
 
@@ -69,8 +68,8 @@ CURRENT_TIMESTAMP = (Built_in_Function)(
 
 EXTRACT = (Built_in_Function)(
     "EXTRACT",
-    args=[KEYWORD, object],
-    args_ms=[FROM],
+    args=[KEYWORDS, object],
+    args_ms=[KEYWORDS.FROM],
     desc="The specified part (DAY, HOUR, etc.) from a DATETIME value",
 )
 
@@ -85,42 +84,42 @@ OCTET_LENGTH = (Built_in_Function)(
 POSITION = (Built_in_Function)(
     "POSITION",
     args=[str, str],
-    args_ms=[IN],
+    args_ms=[KEYWORDS.KEYWORDS.IN],
     desc="The position where the target string appears within the source string",
 )
 
 SUBSTRING = (Built_in_Function)(
     "SUBSTRING",
     args=[str, str, int],
-    args_ms=[FROM, FOR],
+    args_ms=[KEYWORDS.FROM, KEYWORDS.FOR],
     desc="A portion of the source string, beginning at the nth character, for a length of len",
 )
 
 TRANSLATE = (Built_in_Function)(
     "TRANSLATE",
     args=[str, function],
-    args_ms=[USING],
+    args_ms=[KEYWORDS.USING],
     desc="A string translated as specified by a named translation function",
 )
 
 TRIM_BOTH = (Built_in_Function)(
     "TRIM",
     args=[str, str],
-    args_ms=[BOTH, FROM],
+    args_ms=[KEYWORDS.BOTH, KEYWORDS.FROM],
     desc="A string with both leading and trailing occurrences of char trimmed off",
 )
 
 TRIM_LEADING = (Built_in_Function)(
     "TRIM",
     args=[str, str],
-    args_ms=[LEADING, FROM],
+    args_ms=[KEYWORDS.LEADING, KEYWORDS.FROM],
     desc="A string with any leading occurrences of char trimmed off",
 )
 
 TRIM_TRAILING = (Built_in_Function)(
     "TRIM",
     args=[str, str],
-    args_ms=[TRAILING, FROM],
+    args_ms=[KEYWORDS.TRAILING, KEYWORDS.FROM],
     desc="A string with any trailing occurrences of char trimmed off",
 )
 

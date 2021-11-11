@@ -7,6 +7,9 @@ class Data_Type(Name_Space_Base):
     MODIFIERS = []
 
     def __init__(self, column, first=None, second=None) -> None:
+        assert isinstance(
+            column, str
+        ), "Data_Type only accept string type as column name"
         if second:
             assert first, "first must be provided to use second"
         for a in [first, second]:
@@ -42,9 +45,16 @@ class Two_Value(Data_Type):
         super().__init__(name, first, second)
 
 
+class TEXT(Just_Name):
+    ...
+
+
 class CHARACTER(One_Value):
     ABBRS = ["CHAR"]
     DESCRIPTION = "Fixed-length character strings"
+
+    def __init__(self, name, first=255):
+        super().__init__(name, first)
 
 
 class CHAR(CHARACTER):
@@ -54,6 +64,9 @@ class CHAR(CHARACTER):
 class CHARACTER_VARYING(One_Value):
     ABBRS = ["CHAR VARYING", "VARCHAR"]
     DESCRIPTION = "Variable-length character strings"
+
+    def __init__(self, name, first=255):
+        super().__init__(name, first)
 
 
 class VARCHAR(CHARACTER_VARYING):
@@ -97,7 +110,8 @@ class INTEGER(Just_Name):
     DESCRIPTION = "Integers"
 
 
-INT = INTEGER
+class INT(INTEGER):
+    ...
 
 
 class SMALLINT(Just_Name):
@@ -159,16 +173,3 @@ class INTERVAL(Data_Type):
 class XML(Data_Type):
     # (type modifier [secondary type modifier]) :
     DESCRIPTION = "Character data formatted as Extensible Markup Language (XML)"
-
-
-class CONSTANT(Base):
-    def __init__(self, value) -> None:
-        valid = (str, int, float)
-        assert isinstance(value, valid), f"value must be of type {valid}"
-        if isinstance(value, (int, float)):
-            self.value = value
-        elif isinstance(value, str):
-            self.value = f"'{value}'"
-
-    def __str__(self) -> str:
-        return self.value

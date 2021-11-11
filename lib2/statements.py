@@ -1,10 +1,15 @@
+from typing import Union
+
+from .modifiers import Modifier
+from .constraints import Constraint
+from .datatypes import Data_Type
 from .functions import Function, One_Value
 from .clauses import FROM, GROUP_BY, HAVING, ORDER_BY, WHERE, Clause
-from .bases import Base, Column, Columns
-from .operators import AS, TO
+from .bases import MULTI_VALUES, VALUES, Base, Column, Columns, Statement, Table
+from .operators import AS, INTO, TO
 
 
-class SELECT(Base):
+class SELECT(Statement):
 
     DESCRIPTION = ""
     parenthesis = False
@@ -20,6 +25,8 @@ class SELECT(Base):
         into=None,
         distinct=False,
         all=False,
+        limit=False,
+        offset=False,
     ) -> None:
         """
         :columns: instance of Columns|Column
@@ -35,7 +42,9 @@ class SELECT(Base):
                 columns, (str, Columns, Function)
             ), f"type ({str}, {Columns}, {Function}) is expected not {type(columns)}."
         if from_:
-            assert isinstance(from_, FROM)
+            assert isinstance(from_, (str, FROM))
+            if isinstance(from_, str):
+                from_ = FROM(from_)
         if where:
             assert isinstance(where, WHERE)
         if group:
@@ -81,15 +90,22 @@ class SELECT(Base):
         return default
 
 
-class INSERT(Base):
-    def __init__(self, into, values, columns="", where=None) -> None:
-        self.into = into
+class INSERT(Statement):
+    def __init__(self, table, columns=None, values=(), where=None) -> None:
+        if columns:
+            assert type(columns) == Columns
+            columns.parenthesis = True
+        assert type(values) in (VALUES, MULTI_VALUES)
+        assert isinstance(table, (str, Table))
+        assert table
+
+        self.table = INTO(table)
+        self.columns = columns or ""
         self.values = values
-        self.columns = columns
         self.where = where
 
     def __str__(self) -> str:
-        text = f"{self.name} {self.into}"
+        text = f"{self.name} {self.table}"
         if self.columns:
             text += f" {self.columns}"
         text += f" {self.values}"
@@ -99,7 +115,7 @@ class INSERT(Base):
         return text
 
 
-class UPDATE(Base):
+class UPDATE(Statement):
     def __init__(self, table, set, where=None) -> None:
         self.table = table
         self.set = set
@@ -112,7 +128,7 @@ class UPDATE(Base):
         return text
 
 
-class DELETE(Base):
+class DELETE(Statement):
     def __init__(self, table, where=None) -> None:
         self.table = table
         self.where = where
@@ -124,7 +140,7 @@ class DELETE(Base):
         return text
 
 
-class One_Line(Clause):
+class One_Line(Statement, Clause):
     def __init__(self, expression) -> None:
         self.expression = expression
 
@@ -136,43 +152,18 @@ class TRUNCATE(One_Line):
     ...
 
 
-class New_Column(Base):
-    def __init__(self, column_name, tags=[]) -> None:
-        self.column_name = column_name
-        self.tags = tags
-
-    def __str__(self) -> str:
-
-        text = f"{self.column_name}"
-
-        for a in self.tags:
-            text += f" {a}"
-
-        return text
-
-
-NC = New_Column
-
-
 class New_Columns(Columns):
     def __init__(self, *args) -> None:
         """
         :args: instances of New_Column or tuples containing the parameters of a New_Column class
         """
+        allowed = (Data_Type, Constraint, Modifier)
         columns = []
         for arg in args:
-            val = None
-            if isinstance(arg, (str, New_Column)):
-                val = arg
-            elif isinstance(arg, tuple):
-                val = New_Column(arg[0], arg[1])
+            if isinstance(arg, allowed):
+                columns.append(arg)
             else:
-                raise Exception(
-                    "args must be instances of New_Column or tuples containing the parameters of a New_Column class"
-                )
-
-            if val:
-                columns.append(val)
+                raise Exception(f"args must be instances {allowed}")
 
         super().__init__(*columns, parenthesis=True)
 
@@ -186,7 +177,14 @@ class CREATE(One_Line):
 
 
 class CREATE_TABLE(CREATE):
-    def __init__(self, table, new_columns) -> None:
+    def __init__(self, table, *new_columns: New_Columns) -> None:
+        assert new_columns
+
+        if len(new_columns) == 1 and isinstance(new_columns[0], New_Columns):
+            new_columns = new_columns[0]
+        else:
+            new_columns = New_Columns(*new_columns)
+
         assert isinstance(new_columns, New_Columns)
         expression = f"{table} {new_columns}"
         super().__init__(expression)
@@ -201,14 +199,6 @@ class CREATE_VIEW(CREATE):
         assert isinstance(select, SELECT), f"select must be an instance of {SELECT}"
         expression = AS(view, select)
         super().__init__(expression)
-
-
-class Modifier(Base):
-    def __init__(self) -> None:
-        super().__init__()
-
-    def __str__(self) -> str:
-        return super().__str__()
 
 
 class ADD_COLUMN(One_Line):

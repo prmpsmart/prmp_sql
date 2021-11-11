@@ -1,3 +1,6 @@
+import _sqlite3 as _SQL_ENGINE
+
+
 class Base:
     DESCRIPTION = ""
 
@@ -7,6 +10,36 @@ class Base:
 
     def debug(self):
         print(self)
+
+
+class CONSTANT(Base):
+    def __init__(self, value) -> None:
+        valid = (str, int, float)
+        assert isinstance(value, valid), f"value must be of type {valid}"
+        if isinstance(value, (int, float)):
+            self.value = value
+        elif isinstance(value, str):
+            self.value = f"'{value}'"
+
+    def __str__(self) -> str:
+        return str(self.value)
+
+
+class Statement(Base):
+    def __bool__(self):
+        ret = _SQL_ENGINE.complete_statement(self.statement)
+        return ret
+
+    @property
+    def bool(self):
+        return bool(self)
+
+    def debug(self):
+        print(f"({self}) [{self.bool}]")
+
+    @property
+    def statement(self) -> str:
+        return f"{self.__str__()};"
 
 
 class Name_Space_Base(Base):
@@ -64,13 +97,12 @@ class Columns(Base):
 
 
 class VALUES(Columns):
-    def __init__(self, *args, columns=[]) -> None:
-        from .datatypes import CONSTANT
-
-        _columns = list(args)
-        for column in columns:
-            if isinstance(column, str):
-                _columns.append(CONSTANT(column))
+    def __init__(self, *values, insert=True) -> None:
+        _columns = []
+        if insert:
+            for column in values:
+                if not isinstance(column, CONSTANT):
+                    _columns.append(CONSTANT(column))
 
         super().__init__(*_columns, parenthesis=True)
 

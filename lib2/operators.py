@@ -107,6 +107,11 @@ class Name_Operators(Operators):
         super().__init__(self.name.replace("_", " "), first, second=second)
 
 
+class TOP(Name_Operators):
+    def __init__(self, first) -> None:
+        super().__init__(first)
+
+
 class AS(Name_Operators):
     def __init__(self, first, second, hide=False) -> None:
         super().__init__(first, second=second)
@@ -290,7 +295,7 @@ class EXCEPT(_SET):
     ...
 
 
-class JOIN(_SET):
+class JOIN(Statement, _SET):
     ...
 
 
