@@ -1,12 +1,12 @@
 import _pathy
-from lib2.modifiers import *
-from lib2.constraints import *
-from lib2.datatypes import *
-from lib2.functions import *
-from lib2.statements import *
-from lib2.clauses import *
-from lib2.operators import *
-from lib2.database import DataBase
+from lib.modifiers import *
+from lib.constraints import *
+from lib.datatypes import *
+from lib.functions import *
+from lib.statements import *
+from lib.clauses import *
+from lib.operators import *
+from lib.database import DataBase
 
 
 a = LEFT_JOIN(
