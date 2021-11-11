@@ -148,7 +148,7 @@ class One_Line(Statement, Clause):
         return f"{self.name} {self.expression}"
 
 
-class TRUNCATE(One_Line):
+class TRUNCATE_TABLE(One_Line):
     ...
 
 
