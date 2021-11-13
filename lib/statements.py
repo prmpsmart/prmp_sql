@@ -219,12 +219,8 @@ class ADD_COLUMN(One_Line):
             columns = []
             for value in values:
                 col = None
-                if isinstance(value, (str, Column, New_Column)):
+                if isinstance(value, (str, Column)):
                     col = value
-
-                elif isinstance(value, (tuple, list)):
-                    assert len(value) == 2, "Length of Tuple or List must be 2."
-                    col = New_Column(value[0], tags=[value[1]])
 
                 else:
                     raise Exception("Value not supported.")
