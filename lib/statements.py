@@ -155,7 +155,7 @@ class TRUNCATE_TABLE(One_Line):
 class New_Columns(Columns):
     def __init__(self, *args) -> None:
         """
-        :args: instances of New_Column or tuples containing the parameters of a New_Column class
+        :args: instances of (Data_Type, Constraint, Modifier)
         """
         allowed = (Data_Type, Constraint, Modifier)
         columns = []

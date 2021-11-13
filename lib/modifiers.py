@@ -1,17 +1,20 @@
-from .bases import Base
+from .constraints import Constraint
 from .functions import Two_Value
 
 
-class Modifier(Base):
+class Modifier(Constraint):
     ...
 
 
-class IDENTITY(Modifier, Two_Value):
+class IDENTITY(Two_Value, Modifier):
     def __init__(self, value, first, second) -> None:
-        Modifier.__init__(self)
+        Modifier.__init__(self, value)
         Two_Value.__init__(self, first, second)
-        self.value = value
 
     @property
     def name(self):
         return f"{self.value} {super().name}"
+
+
+class AUTOINCREMENT(Modifier):
+    ...

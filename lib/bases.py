@@ -1,6 +1,11 @@
 import _sqlite3 as _SQL_ENGINE
 
 
+class function:
+    # TODO not defined in builtins!
+    ...
+
+
 class Base:
     DESCRIPTION = ""
 
@@ -10,6 +15,9 @@ class Base:
 
     def debug(self):
         print(self)
+
+    def __add__(self, other):
+        return f"{self} {other}"
 
 
 class CONSTANT(Base):
@@ -40,6 +48,12 @@ class Statement(Base):
     @property
     def statement(self) -> str:
         return f"{self.__str__()};"
+
+    def __add__(self, other):
+        s, o = self, other
+        if isinstance(other, Statement):
+            s, o = self.statement, other.statement
+        return f"{s} {o}"
 
 
 class Name_Space_Base(Base):

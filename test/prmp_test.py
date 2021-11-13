@@ -1,4 +1,5 @@
 import _pathy
+from lib.built_in_funtions import BIT_LENGTH, POSITION, TRIM_BOTH, TRIM_LEADING
 from lib.modifiers import *
 from lib.constraints import *
 from lib.datatypes import *
@@ -33,7 +34,7 @@ a = UPDATE(
     WHERE(EQUAL("ArtistName", CONSTANT("Prince"))),
 )
 a = DELETE(Table("Artists"), WHERE(EQUAL("ArtistId", CONSTANT("6"))))
-a = TRUNCATE("Artists")
+a = TRUNCATE_TABLE("Artists")
 a = CREATE(UNIQUE_INDEX(ON("index_name", "table_name", Columns("column1", "column2"))))
 a = ALTER_DATABASE(COLLATE("Movies", "utf8_unicode_ci"))
 a = DROP_DATABASE("Movies")
@@ -60,7 +61,8 @@ a = """CREATE TABLE Persons (
 
 a = CREATE_TABLE(
     "Persons",
-    PRIMARY_KEY(IDENTITY(INT("Personid"), 1, 1)),
+    # PRIMARY_KEY(IDENTITY(INTEGER("Personid"), 1, 1)),
+    AUTOINCREMENT(PRIMARY_KEY(INTEGER("Personid"))),
     NOT_NULL(VARCHAR("LastName")),
     UNIQUE(VARCHAR("FirstName")),
     INT("Age"),
@@ -79,6 +81,12 @@ a = INSERT(
 )
 db.exec_s(a)
 a = SELECT("*", "Persons")
+print(a + a)
 db.commit()
 db = db.exec_s(a)
 print(list(db))
+
+a = POSITION("love", ("love", "hate", "indiff"))
+a = BIT_LENGTH("love")
+a = TRIM_BOTH("h", "hhdgrgssdhh")
+# print(a)
