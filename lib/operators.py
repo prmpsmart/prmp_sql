@@ -296,7 +296,9 @@ class EXCEPT(_SET):
 
 
 class JOIN(Statement, _SET):
-    ...
+    @property
+    def string(self) -> str:
+        return _SET.__str__(self)
 
 
 class INNER_JOIN(JOIN):

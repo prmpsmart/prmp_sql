@@ -12,11 +12,11 @@
 >* Foreign Key – An attribute that can only take the values present as the values of some other attribute, is the foreign key to the attribute to which it refers. in the above example, the Employee_ID from the Employee_Information Table is referred to the Employee_ID from the Employee_Salary Table.
 >* Composite Key – A composite key is a combination of two or more columns that identify each tuple uniquely. Here, the Employee_ID and Month-Year_Of_Salary can be grouped together to uniquely identify every tuple in the table.
 
+## prmp_sql
+
 > A convience SQLite library.
 >
 >Still implementing the codes in *lib* and *lib2* to see the best implementations.
-
-<br/>
 
 ## 1. Example 1
 
@@ -87,8 +87,6 @@
 >        OR ((SALES > QUOTA) AND NOT (SALES > 600000.0)))
 >    ```
 
-<br/>
-
 ## 2. Example 2
 
 >    ``` SQL
@@ -132,3 +130,61 @@
 >        FROM city average_city
 >        WHERE (average_city.country_id = main_city.country_id)))
 >    ```
+
+## Example on creating a database and creating tables in it
+
+>
+>``` py
+>st1 = CREATE_TABLE(
+>    "users",
+>    UNIQUE(VARCHAR("id")),
+>    VARCHAR("name"),
+>    BLOB("icon"),
+>    BLOB("key"),
+>    VARCHAR("description"),
+>)
+>st2 = CREATE_TABLE(
+>    "objects",
+>    UNIQUE(VARCHAR("object_id")),
+>    VARCHAR("name"),
+>    BLOB("icon"),
+>    VARCHAR("description"),
+>    VARCHAR("object_type"),
+>    VARCHAR("creator"),
+>    INT("total_members"),
+>)
+>st3 = CREATE_TABLE(
+>    "chats",
+>    VARCHAR("user_id"),
+>    VARCHAR("recipient_id"),
+>    VARCHAR("text"),
+>    BLOB("data"),
+>    VARCHAR("type"),
+>    VARCHAR("datetime"),
+>    VARCHAR("path"),
+>    BOOLEAN("sent"),
+>    VARCHAR("recipient_type"),
+>)
+>st4 = CREATE_TABLE(
+>    "members",
+>    BOOLEAN("admin"),
+>    BOOLEAN("is_contact"),
+>    VARCHAR("member_id"),
+>    VARCHAR("name"),
+>    BLOB("icon"),
+>    VARCHAR("description"),
+>    VARCHAR("member_type"),
+>)
+>
+>
+>st = [st1, st2, st3]
+># st.debug()
+>
+>db = DB('peachy.db')
+>db.init()
+>
+>for a in st: db.exec(a)
+>db.commit()
+>db.close()
+>
+>```

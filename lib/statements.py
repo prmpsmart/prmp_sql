@@ -68,7 +68,8 @@ class SELECT(Statement):
 
         super()
 
-    def __str__(self):
+    @property
+    def string(self) -> str:
         all_dis = " ALL " if self.all else " DISTINCT " if self.distinct else " "
 
         default = f"{self.name}{all_dis}{self.columns}"
@@ -104,7 +105,8 @@ class INSERT(Statement):
         self.values = values
         self.where = where
 
-    def __str__(self) -> str:
+    @property
+    def string(self) -> str:
         text = f"{self.name} {self.table}"
         if self.columns:
             text += f" {self.columns}"
@@ -121,7 +123,8 @@ class UPDATE(Statement):
         self.set = set
         self.where = where
 
-    def __str__(self) -> str:
+    @property
+    def string(self) -> str:
         text = f"{self.name} {self.table} {self.set}"
         if self.where:
             text += f" {self.where}"
@@ -133,7 +136,8 @@ class DELETE(Statement):
         self.table = table
         self.where = where
 
-    def __str__(self) -> str:
+    @property
+    def string(self) -> str:
         text = f"{self.name} FROM {self.table}"
         if self.where:
             text += f" {self.where}"
@@ -144,7 +148,8 @@ class One_Line(Statement, Clause):
     def __init__(self, expression) -> None:
         self.expression = expression
 
-    def __str__(self) -> str:
+    @property
+    def string(self) -> str:
         return f"{self.name} {self.expression}"
 
 

@@ -105,6 +105,14 @@ class BIT_VARYING(One_Value):
     DESCRIPTION = "Variable-length bit strings"
 
 
+class BLOB(Just_Name):
+    ...
+
+
+class BOOLEAN(Just_Name):
+    ...
+
+
 class INTEGER(Just_Name):
     ABBRS = ["INT"]
     DESCRIPTION = "Integers"

@@ -68,7 +68,58 @@ class Client_Tables:
     )
 
 
-st = CREATE_TABLE(
+st1 = CREATE_TABLE(
     "users",
-    UNIQUE(VARCHAR("id"), VARCHAR("name")),
+    UNIQUE(VARCHAR("id")),
+    VARCHAR("name"),
+    BLOB("icon"),
+    BLOB("key"),
+    VARCHAR("description"),
 )
+st2 = CREATE_TABLE(
+    "objects",
+    UNIQUE(VARCHAR("object_id")),
+    VARCHAR("name"),
+    BLOB("icon"),
+    VARCHAR("description"),
+    VARCHAR("object_type"),
+    VARCHAR("creator"),
+    INT("total_members"),
+)
+st3 = CREATE_TABLE(
+    "chats",
+    VARCHAR("user_id"),
+    VARCHAR("recipient_id"),
+    VARCHAR("text"),
+    BLOB("data"),
+    VARCHAR("type"),
+    VARCHAR("datetime"),
+    VARCHAR("path"),
+    BOOLEAN("sent"),
+    VARCHAR("recipient_type"),
+)
+st4 = CREATE_TABLE(
+    "members",
+    BOOLEAN("admin"),
+    BOOLEAN("is_contact"),
+    VARCHAR("member_id"),
+    VARCHAR("name"),
+    BLOB("icon"),
+    VARCHAR("description"),
+    VARCHAR("member_type"),
+)
+
+
+st = [st1, st2, st3]
+# st.debug()
+
+db = DB('peachy.db')
+db.init()
+
+
+
+exit()
+for a in st: db.exec(a)
+db.commit()
+db.close()
+

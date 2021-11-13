@@ -79,14 +79,14 @@ a = INSERT(
     Columns("LastName", "FirstName", "Age"),
     MULTI_VALUES(("Peter", "Miracle", 22), ("Apata", "Timi", 56)),
 )
-db.exec_s(a)
-a = SELECT("*", "Persons")
-print(a + a)
-db.commit()
-db = db.exec_s(a)
-print(list(db))
+# db.exec_s(a)
+# a = SELECT("*", "Persons")
+# print(a + a)
+# db.commit()
+# db = db.exec_s(a)
+# print(list(db))
 
 a = POSITION("love", ("love", "hate", "indiff"))
 a = BIT_LENGTH("love")
 a = TRIM_BOTH("h", "hhdgrgssdhh")
-# print(a)
+print(a)

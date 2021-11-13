@@ -35,7 +35,7 @@ class CONSTANT(Base):
 
 class Statement(Base):
     def __bool__(self):
-        ret = _SQL_ENGINE.complete_statement(self.statement)
+        ret = _SQL_ENGINE.complete_statement(str(self))
         return ret
 
     @property
@@ -46,14 +46,23 @@ class Statement(Base):
         print(f"({self}) [{self.bool}]")
 
     @property
-    def statement(self) -> str:
-        return f"{self.__str__()};"
+    def string(self) -> str:
+        """"""
+
+    def __str__(self) -> str:
+        return f"{self.string};"
 
     def __add__(self, other):
-        s, o = self, other
-        if isinstance(other, Statement):
-            s, o = self.statement, other.statement
-        return f"{s} {o}"
+        return Statement_(f"{self} {other}")
+
+
+class Statement_(Statement):
+    def __init__(self, string):
+        self._string = string
+
+    @property
+    def string(self) -> str:
+        return self._string
 
 
 class Name_Space_Base(Base):

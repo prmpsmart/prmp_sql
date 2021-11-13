@@ -90,12 +90,12 @@ class Wrapper:
         return self.__connection.create_function(name, narg, func, deterministic)
 
     def execute(self, sql: str, parameters: Iterable[Any] = []) -> Cursor:
-        return self.__connection.execute(sql, parameters)
+        return self.__connection.execute(str(sql), parameters)
 
     exec = execute
 
-    def executemany(self, __sql: str, __parameters: Iterable[Iterable[Any]]) -> Cursor:
-        return self.__connection.executemany(__sql, __parameters)
+    def executemany(self, __sql: str, __parameters: Iterable[Iterable[Any]]=[]) -> Cursor:
+        return self.__connection.executemany(str(__sql), __parameters)
 
     exec_m = executemany
 
@@ -118,10 +118,10 @@ class DataBase(Wrapper):
 
     def execute_statement(self, statement: Statement, many=False, dry=False):
         func = self.executemany if many else self.execute
-        print(statement.statement)
+        print(statement)
         try:
             if not dry:
-                return func(statement.statement)
+                return func(statement)
         except Exception as e:
             print(e)
 
