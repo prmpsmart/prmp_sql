@@ -1,39 +1,6 @@
 from typing import Any
 from .bases import CONSTANT, Base, function
-from .datatypes import Data_Type
 from .keywords import KEYWORDS
-
-
-class Built_in_Function(Base):
-    def __init__(self, name, args=[], ARGS_MODIFIERS=[], desc="") -> None:
-        self.ARGS = args
-        self.DESCRIPTION = desc
-        self.ARGS_MODIFIERS = args_ms
-        self._name = name
-
-    @property
-    def name(self):
-        return self._name
-
-    def __str__(self):
-        a = len(self.ARGS)
-        am = len(self.ARGS_MODIFIERS)
-        name = ""
-        if am == 1:
-            if a == 2:
-                name = f"{a[0]} {am[0]} {a[1]}"
-        elif am == 2:
-            ...
-        else:
-            if a == 1:
-                name = a[0]
-
-        if name:
-            name = f"({name})"
-        return f"{self.className}{name}"
-
-    def __call__(self, *args: Any, **kwds: Any) -> Any:
-        return super().__call__(*args, **kwds)
 
 
 class Built_in_Function(Base):
@@ -168,10 +135,6 @@ class TRIM(Built_in_Function):
     def name(self):
         nm = super().name
         return nm.split("_")[0]
-
-    def __str__(self) -> str:
-        return super().__str__()
-
 
 class TRIM_BOTH(TRIM):
     "A string with both leading and trailing occurrences of char trimmed off"

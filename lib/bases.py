@@ -23,11 +23,12 @@ class Base:
 class CONSTANT(Base):
     def __init__(self, value) -> None:
         valid = (str, int, float)
-        assert isinstance(value, valid), f"value must be of type {valid}"
+        
         if isinstance(value, (int, float)):
             self.value = value
         elif isinstance(value, str):
             self.value = f"'{value}'"
+        else: raise Exception(f"value must be of type {valid}")
 
     def __str__(self) -> str:
         return str(self.value)
@@ -87,19 +88,13 @@ class Column(Table):
         if only first is provided it is assumed as the column name
         """
 
-        if isinstance(first, Table):
-            first = Table(first)
-
-        if second:
-            second, first = first, second
-
-        self.second = second
         super().__init__(first)
+        self.second = second
 
     def __str__(self) -> str:
         text = super().__str__()
         if self.second:
-            text = f"{self.second}.{text}"
+            text += f".{self.second}"
         return text
 
 
@@ -128,9 +123,12 @@ class VALUES(Columns):
                     _columns.append(CONSTANT(column))
 
         super().__init__(*_columns, parenthesis=True)
+    
+    @property
+    def string(self): return super().__str__()
 
     def __str__(self) -> str:
-        return f"{self.name} {super().__str__()}"
+        return f"{self.name} {self.string}"
 
 
 class MULTI_VALUES:
