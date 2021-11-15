@@ -1,4 +1,4 @@
-mixin Base {
+class Base {
   String DESCRIPTION = '';
 
   String get name => runtimeType.toString();
@@ -8,10 +8,10 @@ mixin Base {
   dynamic operator +(other) => '${this.toString()}  ${other.toString()}';
 }
 
-class CONSTANT with Base {
+class CONSTANT extends Base {
   dynamic value;
   CONSTANT(value) {
-    if ((value is int) && (value is double))
+    if ((value is int) || (value is double))
       this.value = value;
     else if (value is String)
       this.value = "'$value'";
@@ -22,7 +22,17 @@ class CONSTANT with Base {
   String toString() => value.toString();
 }
 
-class Statement with Base {
+class Tuple {
+  List list = [];
+  Tuple(this.list);
+
+  @override
+  String toString() {
+    String text = list.join(', ');
+    return '($text)';
+  }
+}
+class Statement extends Base {
   bool __bool__() {
     // TODO
     return true;
@@ -46,11 +56,11 @@ class Statement_ extends Statement {
   String get string => _string;
 }
 
-class Name_Space_Base with Base {
+class Name_Space_Base extends Base {
   String get name => super.name.replaceAll('_', ' ');
 }
 
-class Table with Base {
+class Table extends Base {
   var first;
   Table(this.first);
   @override
@@ -69,7 +79,7 @@ class Column extends Table {
   }
 }
 
-class Columns with Base {
+class Columns extends Base {
   List<dynamic> columns;
   bool parenthesis;
 

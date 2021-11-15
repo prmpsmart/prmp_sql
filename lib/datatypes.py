@@ -1,4 +1,4 @@
-from .bases import Name_Space_Base, Base
+from .bases import Name_Space_Base
 
 
 class Data_Type(Name_Space_Base):

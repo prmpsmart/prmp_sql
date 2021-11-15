@@ -46,8 +46,8 @@ class CAST extends Built_in_Function {
 }
 
 // "The length of a character string"
-class CHAR_LENGTH extends Built_in_Function {
-  CHAR_LENGTH(String string) : super([CONSTANT(string)]);
+class CHAR_LENGTH extends BIT_LENGTH {
+  CHAR_LENGTH(String string) : super(string);
 }
 
 // "A string converted as specified by a named conversion function"
@@ -80,13 +80,13 @@ class EXTRACT extends Built_in_Function {
 }
 
 // "A string converted to all lowercase letters"
-class LOWER extends Built_in_Function {
-  LOWER(String string) : super([CONSTANT(string)]);
+class LOWER extends BIT_LENGTH {
+  LOWER(String string) : super(string);
 }
 
 // "The number of 8-bit bytes in a character string"
-class OCTET_LENGTH extends Built_in_Function {
-  OCTET_LENGTH(String string) : super([CONSTANT(string)]);
+class OCTET_LENGTH extends BIT_LENGTH {
+  OCTET_LENGTH(String string) : super(string);
 }
 
 // "The position where the target string appears within the source string"
@@ -148,6 +148,6 @@ class TRIM_TRAILING extends TRIM {
 }
 
 // "A string converted to all uppercase letters"
-class UPPER extends Built_in_Function {
-  UPPER(String string) : super([CONSTANT(string)]);
+class UPPER extends BIT_LENGTH {
+  UPPER(String string) : super(string);
 }

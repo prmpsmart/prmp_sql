@@ -3,7 +3,7 @@ from typing import Tuple
 from .bases import *
 
 
-class Operators(Base):
+class Operator(Base):
     parenthesis = True
     LTR = True
 
@@ -39,7 +39,7 @@ class Operators(Base):
         return text
 
 
-class Two_Values(Operators):
+class Two_Values(Operator):
     sign = ""
 
     def __init__(self, first, second) -> None:
@@ -102,17 +102,17 @@ class LESS_THAN_EQUAL(Two_Values):
 # ---------------------------------------------------
 
 
-class Name_Operators(Operators):
+class Name_Operator(Operator):
     def __init__(self, first, second=None) -> None:
         super().__init__(self.name.replace("_", " "), first, second=second)
 
 
-class TOP(Name_Operators):
+class TOP(Name_Operator):
     def __init__(self, first) -> None:
         super().__init__(first)
 
 
-class AS(Name_Operators):
+class AS(Name_Operator):
     def __init__(self, first, second, hide=False) -> None:
         super().__init__(first, second=second)
         if hide:
@@ -127,20 +127,21 @@ class TO(AS):
     ...
 
 
-class BETWEEN(Name_Operators):
+class BETWEEN(Name_Operator):
     def __init__(self, first, second, third) -> None:
-        assert type(second) == type(
+        assert type(first) == type(second) == type(
             third
         ), "second and third value must be of same data_type"
         super().__init__(first, second=second)
         self.third = third
+        self.parenthesis = False
 
     def __str__(self) -> str:
         text = super().__str__()
         return f"{text} AND {self.third}"
 
 
-class ESCAPE(Name_Operators):
+class ESCAPE(Name_Operator):
     def __init__(self, first) -> None:
         assert isinstance(first, str) and (
             len(first) == 1
@@ -154,13 +155,13 @@ class ESCAPE(Name_Operators):
         super().__init__(first)
 
 
-class LIMIT(Name_Operators):
+class LIMIT(Name_Operator):
     def __init__(self, first) -> None:
 
         super().__init__(first)
 
 
-class LIKE(Name_Operators):
+class LIKE(Name_Operator):
     WILDCARDS = ["%", "_", "[*...]", "[^...]", "[!...]"]
 
     def __init__(self, first, second, escape=None) -> None:
@@ -180,7 +181,7 @@ class LIKE(Name_Operators):
         return text
 
 
-class IN(Name_Operators):
+class IN(Name_Operator):
     def __init__(self, first, second: Tuple) -> None:
         from .statements import SELECT
 
@@ -192,12 +193,12 @@ class EXISTS(IN):
     ...
 
 
-class AND(Name_Operators):
+class AND(Name_Operator):
     def __init__(self, first, second) -> None:
         super().__init__(first, second=second)
 
 
-class NOT(Name_Operators):
+class NOT(Name_Operator):
     parenthesis = False
 
     def __init__(self, first) -> None:
@@ -208,25 +209,25 @@ class INTO(NOT):
     ...
 
 
-class OR(Name_Operators):
+class OR(Name_Operator):
     def __init__(self, first, second) -> None:
         super().__init__(first, second=second)
 
 
-class DISTINCT(Name_Operators):
+class DISTINCT(Name_Operator):
     def __init__(self, first) -> None:
         assert isinstance(first, (str, Columns))
         super().__init__(first)
 
 
-class COLLATE(Name_Operators):
+class COLLATE(Name_Operator):
     parenthesis = False
 
     def __init__(self, first, second) -> None:
         super().__init__(first, second)
 
 
-class Name_Operators_F(Name_Operators):
+class Name_Operators_F(Name_Operator):
     LTR = False
     parenthesis = False
 
@@ -264,7 +265,7 @@ class ON(Name_Operators_F):
         return f"{text} {self.third}"
 
 
-class _SET(Name_Operators):
+class _SET(Name_Operator):
     parenthesis = False
 
     def __init__(self, first, second) -> None:

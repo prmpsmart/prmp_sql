@@ -89,4 +89,4 @@ a = INSERT(
 a = POSITION("love", ("love", "hate", "indiff"))
 a = BIT_LENGTH("love")
 a = TRIM_BOTH("h", "hhdgrgssdhh")
-print(a)
+print(BETWEEN(1, 2, 3))
