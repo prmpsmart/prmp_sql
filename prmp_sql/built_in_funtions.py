@@ -136,6 +136,7 @@ class TRIM(Built_in_Function):
         nm = super().name
         return nm.split("_")[0]
 
+
 class TRIM_BOTH(TRIM):
     "A string with both leading and trailing occurrences of char trimmed off"
     ADD_MODIFIERS = KEYWORDS.BOTH

@@ -4,10 +4,10 @@ from .bases import *
 
 
 class Operator(Base):
-    parenthesis = True
     LTR = True
+    parenthesis = True
 
-    def __init__(self, operator, first, second=None) -> None:
+    def __init__(self, operator, first, second=None, parenthesis=None) -> None:
         """
         :operator: Operator value can not be [None, 0]
         :first: First value can not be [None, Empty string, 0]
@@ -17,12 +17,13 @@ class Operator(Base):
         if isinstance(second, SELECT):
             second.parenthesis = True
 
+        if parenthesis!=None: self.parenthesis =parenthesis
         self.operator = operator
         self.first = first
         self.second = second
 
     def __str__(self) -> str:
-        ln = [bool(self.first), bool(self.second)].count(True)
+        ln = [self.first==None, self.second==None].count(False)
         text = ""
 
         if ln == 1:
@@ -42,8 +43,8 @@ class Operator(Base):
 class Two_Values(Operator):
     sign = ""
 
-    def __init__(self, first, second) -> None:
-        super().__init__(self.sign, first, second=second)
+    def __init__(self, first, second, **kwargs) -> None:
+        super().__init__(self.sign, first, second=second, **kwargs)
 
 
 class MINUS(Two_Values):
@@ -129,8 +130,8 @@ class TO(AS):
 
 class BETWEEN(Name_Operator):
     def __init__(self, first, second, third) -> None:
-        assert type(first) == type(second) == type(
-            third
+        assert (
+            type(first) == type(second) == type(third)
         ), "second and third value must be of same data_type"
         super().__init__(first, second=second)
         self.third = third

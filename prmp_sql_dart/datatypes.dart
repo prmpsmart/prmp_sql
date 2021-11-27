@@ -14,7 +14,7 @@ class Data_Type extends Name_Space_Base {
       // "first must be provided to use second"
       assert(first != null);
     [first, second].forEach((element) {
-      assert((element is int) || (element is double));
+      assert([int, double].contains(element.runtimeType));
     });
   }
   @override

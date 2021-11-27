@@ -1,4 +1,5 @@
 import 'bases.dart';
+import 'statements.dart';
 
 class Operator with Base {
   bool parenthesis = true;
@@ -197,7 +198,8 @@ class LIKE extends Name_Operator {
 
 class IN extends Name_Operator {
   IN(first, second) : super(first, second: second) {
-    assert((second.runtimeType.toString() == 'SELECT') || (second is Tuple));
+    // assert((second.runtimeType.toString() == 'SELECT') || (second is Tuple));
+    assert([SELECT, Tuple].contains(second.runtimeType));
   }
 }
 
@@ -225,7 +227,7 @@ class OR extends Name_Operator {
 
 class DISTINCT extends Name_Operator {
   DISTINCT(first) : super(first) {
-    assert((first is String) || (first is Columns));
+    assert([String, Columns].contains(first.runtimeType));
   }
 }
 
@@ -261,7 +263,7 @@ class DESC extends Name_Operator_F {
 class ON extends Name_Operator_F {
   dynamic third;
   ON(first, second, third) : super(first, second: second) {
-    assert((third is Tuple) || (third is Columns));
+    assert([Tuple,Columns].contains(third.runtimeType));
 
     if (third is Columns) third.parenthesis = true;
     this.third = third;

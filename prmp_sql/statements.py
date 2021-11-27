@@ -1,10 +1,8 @@
-from typing import Union
-
 from .modifiers import Modifier
 from .constraints import Constraint
 from .datatypes import Data_Type
 from .functions import Function, One_Value
-from .clauses import FROM, GROUP_BY, HAVING, ORDER_BY, WHERE, Clause
+from .clauses import FROM, GROUP_BY, HAVING, ORDER_BY, WHERE, Clause, SET
 from .bases import MULTI_VALUES, VALUES, Base, Column, Columns, Statement, Table
 from .operators import AS, INTO, TO
 
@@ -53,7 +51,8 @@ class SELECT(Statement):
             assert isinstance(having, HAVING)
         if order:
             assert isinstance(order, ORDER_BY)
-        # assert isinstance(into, (str, INTO_TABLE))
+        if into:
+            assert isinstance(into, (str, INTO))
 
         self.columns = columns
         self.from_ = from_
@@ -65,8 +64,6 @@ class SELECT(Statement):
 
         self.distinct = distinct
         self.all = all
-
-        super()
 
     @property
     def string(self) -> str:
@@ -92,18 +89,17 @@ class SELECT(Statement):
 
 
 class INSERT(Statement):
-    def __init__(self, table, columns=None, values=(), where=None) -> None:
+    def __init__(self, table, columns=None, values=()) -> None:
         if columns:
             assert type(columns) == Columns
             columns.parenthesis = True
-        assert type(values) in (VALUES, MULTI_VALUES)
+        assert isinstance(values, (VALUES, MULTI_VALUES))
         assert isinstance(table, (str, Table))
         assert table
 
         self.table = INTO(table)
         self.columns = columns or ""
         self.values = values
-        self.where = where
 
     @property
     def string(self) -> str:
@@ -111,16 +107,16 @@ class INSERT(Statement):
         if self.columns:
             text += f" {self.columns}"
         text += f" {self.values}"
-        if self.where:
-            text += f" {self.where}"
 
         return text
 
 
 class UPDATE(Statement):
-    def __init__(self, table, set, where=None) -> None:
+    def __init__(self, table, set: SET, where: WHERE=None) -> None:
         self.table = table
+        assert isinstance(set, SET)
         self.set = set
+        assert isinstance(where, WHERE)
         self.where = where
 
     @property
@@ -144,7 +140,7 @@ class DELETE(Statement):
         return text
 
 
-class One_Line(Statement, Clause):
+class One_Line(Statement):
     def __init__(self, expression) -> None:
         self.expression = expression
 
@@ -177,12 +173,11 @@ NCs = New_Columns
 
 
 class CREATE(One_Line):
-    def __init__(self, expression) -> None:
-        super().__init__(expression)
+    ...
 
 
 class CREATE_TABLE(CREATE):
-    def __init__(self, table, *new_columns: New_Columns) -> None:
+    def __init__(self, table, *new_columns: New_Columns, check_exist=False) -> None:
         assert new_columns
 
         if len(new_columns) == 1 and isinstance(new_columns[0], New_Columns):
@@ -191,7 +186,9 @@ class CREATE_TABLE(CREATE):
             new_columns = New_Columns(*new_columns)
 
         assert isinstance(new_columns, New_Columns)
-        expression = f"{table} {new_columns}"
+        exist = 'IF NOT EXISTS' if check_exist else ''
+
+        expression = f"{exist} {table} {new_columns}"
         super().__init__(expression)
 
 

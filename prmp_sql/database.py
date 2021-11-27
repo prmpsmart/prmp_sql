@@ -2,6 +2,8 @@ import sqlite3 as SQL_ENGINE
 from sqlite3.dbapi2 import *
 from typing import *
 
+from prmp_sql.statements import SELECT
+
 from .bases import Statement
 
 
@@ -90,14 +92,14 @@ class Wrapper:
         return self.__connection.create_function(name, narg, func, deterministic)
 
     def execute(self, sql: str, parameters: Iterable[Any] = []) -> Cursor:
+        'returns a cursor object, which can be used to retrieve the values in case of SELECT statement.'
         return self.__connection.execute(str(sql), parameters)
 
-    exec = execute
 
-    def executemany(self, __sql: str, __parameters: Iterable[Iterable[Any]]=[]) -> Cursor:
+    def executemany(
+        self, __sql: str, __parameters: Iterable[Iterable[Any]] = []
+    ) -> Cursor:
         return self.__connection.executemany(str(__sql), __parameters)
-
-    exec_m = executemany
 
     def executescript(self, __sql_script: Union[bytes, str]) -> Cursor:
         return self.__connection.executescript(__sql_script)
@@ -116,27 +118,17 @@ class DataBase(Wrapper):
     def __init__(self, path=":memory:") -> None:
         Wrapper.__init__(self, path)
 
-    def execute_statement(self, statement: Statement, many=False, dry=False):
+    def execute_statement(self, statement: Statement, many=False, dry=False, quiet=False, parameters=[]):
         func = self.executemany if many else self.execute
-        print(statement)
+        if not quiet: print(statement)
         try:
             if not dry:
-                return func(statement)
+                assert isinstance(parameters, list)
+                res = func(statement, parameters)
+                # if isinstance(statement, SELECT): res = list(res)
+                return list(res)
         except Exception as e:
-            print(e)
+            return str(e)
 
-    exec_s = execute_statement
-
-    def insert(self, table_name="", map={}, where="", insert_obj=None):
-        ...
-
-    def update(self, table_name="", map={}, where="", update_obj=None):
-        ...
-
-    def delete(self, table_name="", map={}, where="", delete_obj=None):
-        ...
-
-    def select(self, table_name="", columns=[], where="", select_obj=None):
-        ...
-
-    query = select
+    exec = execute_statement
+    

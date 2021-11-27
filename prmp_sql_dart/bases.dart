@@ -11,7 +11,7 @@ class Base {
 class CONSTANT extends Base {
   dynamic value;
   CONSTANT(value) {
-    if ((value is int) || (value is double))
+    if ([int, double].contains(value.runtimeType))
       this.value = value;
     else if (value is String)
       this.value = "'$value'";
@@ -32,7 +32,11 @@ class Tuple {
     return '($text)';
   }
 }
-class Statement extends Base {
+
+class Name_Space_Base extends Base {
+  String get name => super.name.replaceAll('_', ' ');
+}
+class Statement extends Name_Space_Base {
   bool __bool__() {
     // TODO
     return true;
@@ -56,13 +60,12 @@ class Statement_ extends Statement {
   String get string => _string;
 }
 
-class Name_Space_Base extends Base {
-  String get name => super.name.replaceAll('_', ' ');
-}
 
 class Table extends Base {
-  var first;
-  Table(this.first);
+  String first;
+  Table(this.first) {
+    assert(first.isNotEmpty);
+  }
   @override
   String toString() => first;
 }

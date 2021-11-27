@@ -1,5 +1,5 @@
 from .operators import EQUAL
-from .bases import Name_Space_Base, Columns
+from .bases import Name_Space_Base, Columns, CONSTANT, Column
 
 
 class Clause(Name_Space_Base):
@@ -41,10 +41,15 @@ class ORDER_BY(Clause):
 
 
 class SET(Clause):
-    def __init__(self, *values) -> None:
+    def __init__(self, *values, columns=[]) -> None:
         """
         :values: tuple, list of length 2, or instance of EQUAL
         """
+        if columns:
+            values = [CONSTANT(a) if not isinstance(a, Column) else a for a in values]
+
+            values = list(zip(columns, values))
+
         expression = None
         l = len(values)
         if l:

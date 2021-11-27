@@ -4,9 +4,9 @@ import 'operators.dart';
 import 'bases.dart';
 
 class Clause extends Name_Space_Base {
-  dynamic? expression;
+  dynamic expression;
 
-  Clause({this.expression});
+  Clause(this.expression);
   @override
   String toString() {
     String name = this.name;
@@ -15,23 +15,31 @@ class Clause extends Name_Space_Base {
   }
 }
 
-class FROM extends Clause {}
+class FROM extends Clause {
+  FROM(expression) : super(expression);
+}
 
-class WHERE extends Clause {}
+class WHERE extends Clause {
+  WHERE(expression) : super(expression);
+}
 
-class GROUP_BY extends Clause {}
+class GROUP_BY extends Clause {
+  GROUP_BY(expression) : super(expression);
+}
 
-class HAVING extends Clause {}
+class HAVING extends Clause {
+  HAVING(expression) : super(expression);
+}
 
 class ORDER_BY extends Clause {
-  ORDER_BY(columns) : super(expression: columns) {
+  ORDER_BY(columns) : super(columns) {
     if (!(columns is Columns)) expression = Columns(columns);
   }
 }
 
 class SET extends Clause {
   // :values: tuple, list of length 2, or instance of EQUAL
-  SET(List values) : super() {
+  SET(List values) : super('') {
     int l = values.length;
     if (l > 0) {
       List<Type> ll = [];
@@ -50,7 +58,7 @@ class SET extends Clause {
             // "Tuple or List must be of len 2, (column_name1, value1) i.e column_name1 = value1"
             assert(value.length == 2);
             equal = EQUAL(value[0], value[1]);
-          } else if ((value is EQUAL) || (value is SET)) equal = value;
+          } else if ([EQUAL,  SET].contains(value.runtimeType)) equal = value;
 
           equal.parenthesis = false;
           columns.add(equal);
@@ -62,7 +70,7 @@ class SET extends Clause {
 }
 
 class INDEX extends Clause {
-  INDEX(expression) : super(expression: expression);
+  INDEX(expression) : super(expression);
 
   @override
   String toString() => "$name $expression";

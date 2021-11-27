@@ -1,3 +1,4 @@
+from sqlite3.dbapi2 import Binary
 import _sqlite3 as _SQL_ENGINE
 
 
@@ -18,23 +19,38 @@ class Base:
 
     def __add__(self, other):
         return f"{self} {other}"
+    
+    def __repr__(self): return self.__str__()
 
 
 class CONSTANT(Base):
     def __init__(self, value) -> None:
-        valid = (str, int, float)
-        
-        if isinstance(value, (int, float)):
+        number = [int, float]
+        string = [str, bytes]
+        valid = [*number, *string]
+
+        if isinstance(value, bool):
+            self.value = str(value).lower()
+        elif isinstance(value, tuple(number)):
             self.value = value
         elif isinstance(value, str):
             self.value = f"'{value}'"
-        else: raise Exception(f"value must be of type {valid}")
+        elif isinstance(value, bytes):
+            self.value = Binary(value)
+        else:
+            raise Exception(f"value must be of type {valid}")
 
     def __str__(self) -> str:
         return str(self.value)
 
 
-class Statement(Base):
+class Name_Space_Base(Base):
+    @property
+    def name(self):
+        return super().name.replace("_", " ")
+
+
+class Statement(Name_Space_Base):
     def __bool__(self):
         ret = _SQL_ENGINE.complete_statement(str(self))
         return ret
@@ -61,15 +77,8 @@ class Statement_(Statement):
     def __init__(self, string):
         self._string = string
 
-    @property
-    def string(self) -> str:
+    def __str__(self) -> str:
         return self._string
-
-
-class Name_Space_Base(Base):
-    @property
-    def name(self):
-        return super().name.replace("_", " ")
 
 
 class Table(Base):
@@ -119,13 +128,16 @@ class VALUES(Columns):
         _columns = []
         if insert:
             for column in values:
-                if not isinstance(column, CONSTANT):
+                
+                if isinstance(column, str):
                     _columns.append(CONSTANT(column))
+                else: _columns.append(column)
 
         super().__init__(*_columns, parenthesis=True)
-    
+
     @property
-    def string(self): return super().__str__()
+    def string(self):
+        return super().__str__()
 
     def __str__(self) -> str:
         return f"{self.name} {self.string}"
