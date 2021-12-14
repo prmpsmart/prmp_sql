@@ -1,13 +1,13 @@
 import _pathy
-from lib.built_in_funtions import BIT_LENGTH, POSITION, TRIM_BOTH, TRIM_LEADING
-from lib.modifiers import *
-from lib.constraints import *
-from lib.datatypes import *
-from lib.functions import *
-from lib.statements import *
-from lib.clauses import *
-from lib.operators import *
-from lib.database import DataBase
+from prmp_sql.built_in_funtions import BIT_LENGTH, POSITION, TRIM_BOTH, TRIM_LEADING
+from prmp_sql.modifiers import *
+from prmp_sql.constraints import *
+from prmp_sql.datatypes import *
+from prmp_sql.functions import *
+from prmp_sql.statements import *
+from prmp_sql.clauses import *
+from prmp_sql.operators import *
+from prmp_sql.database import DataBase
 
 
 a = LEFT_JOIN(
