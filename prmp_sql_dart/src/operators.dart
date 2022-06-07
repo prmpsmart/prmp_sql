@@ -1,5 +1,7 @@
-import 'bases.dart';
-import 'statements.dart';
+// ignore_for_file: non_constant_identifier_names, camel_case_types
+
+import './bases.dart';
+import './statements.dart';
 
 class Operator with Base {
   bool parenthesis = true;
@@ -10,8 +12,6 @@ class Operator with Base {
   dynamic first, second;
 
   Operator(this.first, {this.second}) {
-    assert(operator.isNotEmpty);
-
     if (second.runtimeType.toString() == 'SELECT') second.parenthesis = true;
   }
   @override
@@ -76,6 +76,10 @@ class EQUAL extends Two_Values {
   String operator = "=";
 
   EQUAL(first, second) : super(first, second);
+}
+
+class EQUAL_TO_STRING extends EQUAL {
+  EQUAL_TO_STRING(first, second) : super(first, CONSTANT(second));
 }
 
 class NOT_EQUAL extends Two_Values {
@@ -181,7 +185,7 @@ class LIKE extends Name_Operator {
   List<String> WILDCARDS = ["%", "_", "[*...]", "[^...]", "[!...]"];
   ESCAPE? escape;
 
-  LIKE(first, String second, {escape = null}) : super(first, second: second) {
+  LIKE(first, String second, {escape}) : super(first, second: second) {
     // "second value must be a string containing wildcards"
 
     if (escape is String) escape = ESCAPE(escape);
@@ -263,7 +267,7 @@ class DESC extends Name_Operator_F {
 class ON extends Name_Operator_F {
   dynamic third;
   ON(first, second, third) : super(first, second: second) {
-    assert([Tuple,Columns].contains(third.runtimeType));
+    assert([Tuple, Columns].contains(third.runtimeType));
 
     if (third is Columns) third.parenthesis = true;
     this.third = third;

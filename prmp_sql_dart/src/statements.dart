@@ -1,10 +1,12 @@
-import 'modifiers.dart';
-import 'constraints.dart';
-import 'datatypes.dart' show Data_Type;
-import 'functions.dart';
-import 'clauses.dart';
-import 'bases.dart';
-import 'operators.dart';
+// ignore_for_file: non_constant_identifier_names, camel_case_types, unused_shown_name
+
+import './modifiers.dart';
+import './constraints.dart';
+import './datatypes.dart' show Data_Type, Data_Type_One_Value;
+import './functions.dart' show Function_, Function_One_Value;
+import './clauses.dart';
+import './bases.dart';
+import './operators.dart';
 
 class SELECT extends Statement {
   String DESCRIPTION = "";
@@ -33,10 +35,14 @@ class SELECT extends Statement {
       this.all,
       this.limit,
       this.offset}) {
-    if ([String, Columns, Function].contains(columns.runtimeType))
+    bool allowed = false;
+    if ((columns is String) || (columns is Columns) || (columns is Function_))
+      allowed = true;
+
+    if (allowed)
       this.columns = columns;
     else
-      throw "type ($String, $Columns, $Function) is expected not ${columns.runtimeType}.";
+      throw "type ($String, $Columns, $Function_) is expected not ${columns.runtimeType}.";
     if (from is String) from = FROM(from);
     this.from = from;
   }
@@ -56,9 +62,7 @@ class SELECT extends Statement {
     if (group != null) default_ += " $group";
     if (having != null) default_ += " $having";
     if (order != null) default_ += " $order";
-
     if (parenthesis) default_ = "($default_)";
-
     return default_;
   }
 }
@@ -68,11 +72,12 @@ class INSERT extends Statement {
   Columns? columns;
   dynamic values;
   WHERE? where;
-  INSERT(table, {columns, values, where}) {
+  INSERT(table, {Columns? columns, values, where}) {
     if (columns != null) {
       assert(columns is Columns);
       columns.parenthesis = true;
     }
+
     assert([VALUES, MULTI_VALUES].contains(values.runtimeType));
     assert([String, Table].contains(table.runtimeType));
 
@@ -136,13 +141,20 @@ class TRUNCATE_TABLE extends One_Line {
 class New_Columns extends Columns {
   // :args: instances of (Data_Type, Constraint, Modifier)
   New_Columns(List args) : super([], parenthesis: true) {
-    List allowed = [Data_Type, Constraint, Modifier];
     List columns = [];
+
     args.forEach((arg) {
-      if (allowed.contains(arg.runtimeType))
+      bool allowed = false;
+      if (arg is Data_Type)
+        allowed = true;
+      else if (arg is Constraint)
+        allowed = true;
+      else if (arg is Modifier) allowed = true;
+
+      if (allowed)
         columns.add(arg);
       else
-        throw "args must be instances $allowed";
+        throw "args must be instances $allowed, not \"${arg.runtimeType}\"";
     });
     this.columns = columns;
   }
@@ -153,20 +165,19 @@ class CREATE extends One_Line {
 }
 
 class CREATE_TABLE extends CREATE {
-  CREATE_TABLE(table, List new_columns_, {bool check_exist=false}) : super('') {
+  CREATE_TABLE(table, List new_columns_, {bool check_exist = false})
+      : super('') {
     assert(new_columns_.isNotEmpty);
     New_Columns new_columns;
 
-    if ((new_columns_.length == 1) &&
-        (new_columns_[0].runtimeType is New_Columns))
+    if ((new_columns_.length == 1) && (new_columns_[0] is New_Columns))
       new_columns = new_columns_[0];
     else
       new_columns = New_Columns(new_columns_);
 
-    assert(new_columns.runtimeType is New_Columns);
-    String 
-        exist = check_exist ?'IF NOT EXIST' : '';
-    expression = "$table $exist $new_columns";
+    assert(new_columns is New_Columns);
+    String exist = check_exist ? 'IF NOT EXISTS' : '';
+    expression = "$exist $table $new_columns";
   }
 }
 
@@ -280,6 +291,6 @@ class RENAME_TABLE extends RENAME {
   RENAME_TABLE(TO expression) : super(expression);
 }
 
-class WITH extends One_Value {
+class WITH extends Function_One_Value {
   WITH(first) : super(first);
 }

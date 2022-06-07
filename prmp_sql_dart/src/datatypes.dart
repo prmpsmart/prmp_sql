@@ -1,4 +1,6 @@
-import 'bases.dart';
+// ignore_for_file: camel_case_types, non_constant_identifier_names
+
+import './bases.dart';
 
 class Data_Type extends Name_Space_Base {
   List ABBRS = [];
@@ -13,16 +15,17 @@ class Data_Type extends Name_Space_Base {
     if (second != null)
       // "first must be provided to use second"
       assert(first != null);
-    [first, second].forEach((element) {
-      assert([int, double].contains(element.runtimeType));
-    });
+    // [first, second].forEach((element) {
+    //   print('$element -> ${element.runtimeType} ${[int, double].contains(element.runtimeType)}');
+    //   assert([int, double].contains(element.runtimeType));
+    // });
   }
   @override
   String toString() {
     String text = "$column $name";
     if (first != null) {
       text += "($first";
-      if (second! + null) text += ", $second";
+      if (second != null) text += ", $second";
       text += ")";
     }
     return text;
@@ -33,19 +36,20 @@ class Just_Name extends Data_Type {
   Just_Name(name) : super(name);
 }
 
-class One_Value extends Data_Type {
-  One_Value(name, first) : super(name, first: first);
+class Data_Type_One_Value extends Data_Type {
+  Data_Type_One_Value(name, first) : super(name, first: first);
 }
 
-class Two_Value extends Data_Type {
-  Two_Value(name, first, second) : super(name, first: first, second: second);
+class Data_Type_Two_Value extends Data_Type {
+  Data_Type_Two_Value(name, first, second)
+      : super(name, first: first, second: second);
 }
 
 class TEXT extends Just_Name {
   TEXT(name) : super(name);
 }
 
-class CHARACTER extends One_Value {
+class CHARACTER extends Data_Type_One_Value {
   List ABBRS = ["CHAR"];
   String DESCRIPTION = "Fixed-length character strings";
 
@@ -56,7 +60,7 @@ class CHAR extends CHARACTER {
   CHAR(name) : super(name);
 }
 
-class CHARACTER_VARYING extends One_Value {
+class CHARACTER_VARYING extends Data_Type_One_Value {
   List ABBRS = ["CHAR VARYING", "VARCHAR"];
   String DESCRIPTION = "Variable-length character strings";
 
@@ -67,7 +71,7 @@ class VARCHAR extends CHARACTER_VARYING {
   VARCHAR(name) : super(name);
 }
 
-class CHARACTER_LARGE_OBJECT extends One_Value {
+class CHARACTER_LARGE_OBJECT extends Data_Type_One_Value {
   List ABBRS = ["CLOB"];
   String DESCRIPTION = "Large fixed-length character strings";
 
@@ -78,34 +82,34 @@ class CLOB extends CHARACTER_LARGE_OBJECT {
   CLOB(name, first) : super(name, first);
 }
 
-class NATIONAL_CHARACTER extends One_Value {
+class NATIONAL_CHARACTER extends Data_Type_One_Value {
   List ABBRS = ["NATIONAL CHAR", "NCHAR"];
   String DESCRIPTION = "Fixed-length national character strings";
 
   NATIONAL_CHARACTER(name, first) : super(name, first);
 }
 
-class NATIONAL_CHARACTER_VARYING extends One_Value {
+class NATIONAL_CHARACTER_VARYING extends Data_Type_One_Value {
   List ABBRS = ["NATIONAL CHAR VARYING", "NCHAR"];
   String DESCRIPTION = "Variable-length national character strings";
 
   NATIONAL_CHARACTER_VARYING(name, first) : super(name, first);
 }
 
-class NATIONAL_CHARACTER_LARGE_OBJECT extends One_Value {
+class NATIONAL_CHARACTER_LARGE_OBJECT extends Data_Type_One_Value {
   List ABBRS = ["NCLOB"];
   String DESCRIPTION = "Large variable-length national character strings";
 
   NATIONAL_CHARACTER_LARGE_OBJECT(name, first) : super(name, first);
 }
 
-class BIT extends One_Value {
+class BIT extends Data_Type_One_Value {
   String DESCRIPTION = "Fixed-length bit strings";
 
   BIT(name, first) : super(name, first);
 }
 
-class BIT_VARYING extends One_Value {
+class BIT_VARYING extends Data_Type_One_Value {
   String DESCRIPTION = "Variable-length bit strings";
 
   BIT_VARYING(name, first) : super(name, first);
@@ -136,14 +140,14 @@ class SMALLINT extends Just_Name {
   SMALLINT(name) : super(name);
 }
 
-class NUMERIC extends Two_Value {
+class NUMERIC extends Data_Type_Two_Value {
   List FUNCTIONAL_ARGS = [double, int];
   String DESCRIPTION = "Decimal numbers";
 
   NUMERIC(name, first, second) : super(name, first, second);
 }
 
-class DECIMAL extends Two_Value {
+class DECIMAL extends Data_Type_Two_Value {
   List ABBRS = ["DEC"];
   List FUNCTIONAL_ARGS = [double, int];
   String DESCRIPTION = "Decimal numbers";
@@ -151,7 +155,7 @@ class DECIMAL extends Two_Value {
   DECIMAL(name, first, second) : super(name, first, second);
 }
 
-class FLOAT extends One_Value {
+class FLOAT extends Data_Type_One_Value {
   List FUNCTIONAL_ARGS = [double];
   String DESCRIPTION = "Floating point numbers";
 
@@ -176,28 +180,28 @@ class DATE extends Just_Name {
   DATE(name) : super(name);
 }
 
-class TIME extends One_Value {
+class TIME extends Data_Type_One_Value {
   List FUNCTIONAL_ARGS = [double];
   String DESCRIPTION = "Clock times";
 
   TIME(name, first) : super(name, first);
 }
 
-class TIME_WITH_TIME_ZONE extends One_Value {
+class TIME_WITH_TIME_ZONE extends Data_Type_One_Value {
   List FUNCTIONAL_ARGS = [double];
   String DESCRIPTION = "Clock times with time zones";
 
   TIME_WITH_TIME_ZONE(name, first) : super(name, first);
 }
 
-class TIMESTAMP extends One_Value {
+class TIMESTAMP extends Data_Type_One_Value {
   List FUNCTIONAL_ARGS = [double];
   String DESCRIPTION = "Dates and times";
 
   TIMESTAMP(name, first) : super(name, first);
 }
 
-class TIMESTAMP_WITH_TIME_ZONE extends One_Value {
+class TIMESTAMP_WITH_TIME_ZONE extends Data_Type_One_Value {
   List FUNCTIONAL_ARGS = [double];
   String DESCRIPTION = "Dates and times with time zones";
 

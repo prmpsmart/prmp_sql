@@ -1,11 +1,11 @@
-import 'constraints.dart' show Constraint;
-import 'functions.dart' show Two_Value;
+import './constraints.dart' show Constraint;
+import './functions.dart' show Function_Two_Value;
 
 class Modifier extends Constraint {
   Modifier(value) : super(value);
 }
 
-class IDENTITY extends Two_Value {
+class IDENTITY extends Function_Two_Value {
   dynamic value;
 
   IDENTITY(this.value, first, second) : super(first, second);

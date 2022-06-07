@@ -14,9 +14,13 @@
 
 ## prmp_sql
 
-> A convience SQLite library.
+> A convience SQL Statement library.
 >
->Still implementing the codes in *lib* and *lib2* to see the best implementations.
+> prmp_sql is a library that makes writing valid SQL statements easier and programmatic.
+
+## Languages supported:
+1. **Python (py_sql)**
+2. **Dart/Flutter (dart_sql)**
 
 ## 1. Example 1
 

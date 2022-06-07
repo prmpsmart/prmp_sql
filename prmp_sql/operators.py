@@ -71,6 +71,11 @@ class EQUAL(Two_Values):
     sign = "="
 
 
+class EQUAL_TO_STRING(EQUAL):
+    def __init__(self, first, second, **kwargs) -> None:
+        super().__init__(first, CONSTANT(second), **kwargs)
+
+
 class NOT_EQUAL(Two_Values):
     OPERATORS = ["!=", "<>"]
     sign = "<>"

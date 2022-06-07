@@ -1,12 +1,13 @@
-import 'dart:indexed_db';
+// ignore_for_file: camel_case_types
 
-import 'operators.dart';
-import 'bases.dart';
+import './operators.dart';
+import './bases.dart';
 
 class Clause extends Name_Space_Base {
   dynamic expression;
 
   Clause(this.expression);
+
   @override
   String toString() {
     String name = this.name;
@@ -38,7 +39,7 @@ class ORDER_BY extends Clause {
 }
 
 class SET extends Clause {
-  // :values: tuple, list of length 2, or instance of EQUAL
+  // tuple, list of length 2, or instance of EQUAL
   SET(List values) : super('') {
     int l = values.length;
     if (l > 0) {
@@ -53,14 +54,14 @@ class SET extends Clause {
       } else {
         List columns = [];
         values.forEach((value) {
-          dynamic equal = null;
+          var equal;
           if (value is List) {
             // "Tuple or List must be of len 2, (column_name1, value1) i.e column_name1 = value1"
             assert(value.length == 2);
             equal = EQUAL(value[0], value[1]);
-          } else if ([EQUAL,  SET].contains(value.runtimeType)) equal = value;
+          } else if ((value is EQUAL) || (value is SET)) equal = value;
 
-          equal.parenthesis = false;
+          if (equal != null) equal.parenthesis = false;
           columns.add(equal);
         });
         expression = Columns(columns);

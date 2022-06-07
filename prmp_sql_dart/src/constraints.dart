@@ -1,4 +1,6 @@
-import 'bases.dart';
+// ignore_for_file: camel_case_types
+
+import './bases.dart';
 
 class Constraint extends Base {
   dynamic value;

@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names, camel_case_types, unused_element
+
 class Base {
   String DESCRIPTION = '';
 
@@ -11,12 +13,12 @@ class Base {
 class CONSTANT extends Base {
   dynamic value;
   CONSTANT(value) {
-    if ([int, double].contains(value.runtimeType))
+    if ([int, double, bool].contains(value.runtimeType))
       this.value = value;
     else if (value is String)
       this.value = "'$value'";
     else
-      throw ('value must be of type int, double, String');
+      throw ('value must be of type int, double, String not ${value.runtimeType}');
   }
   @override
   String toString() => value.toString();
@@ -36,9 +38,9 @@ class Tuple {
 class Name_Space_Base extends Base {
   String get name => super.name.replaceAll('_', ' ');
 }
+
 class Statement extends Name_Space_Base {
   bool __bool__() {
-    // TODO
     return true;
   }
 
@@ -59,7 +61,6 @@ class Statement_ extends Statement {
   @override
   String get string => _string;
 }
-
 
 class Table extends Base {
   String first;

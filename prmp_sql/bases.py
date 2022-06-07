@@ -1,5 +1,4 @@
-from sqlite3.dbapi2 import Binary
-import _sqlite3 as _SQL_ENGINE
+
 
 
 class function:
@@ -36,9 +35,9 @@ class CONSTANT(Base):
         elif isinstance(value, str):
             self.value = f"'{value}'"
         elif isinstance(value, bytes):
-            self.value = Binary(value)
+            self.value = memoryview(value)
         else:
-            raise Exception(f"value must be of type {valid}")
+            raise Exception(f"value must be of type {valid} not {type(value)}")
 
     def __str__(self) -> str:
         return str(self.value)
@@ -52,7 +51,8 @@ class Name_Space_Base(Base):
 
 class Statement(Name_Space_Base):
     def __bool__(self):
-        ret = _SQL_ENGINE.complete_statement(str(self))
+        import _sqlite3
+        ret = _sqlite3.complete_statement(str(self))
         return ret
 
     @property

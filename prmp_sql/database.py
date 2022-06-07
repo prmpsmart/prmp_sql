@@ -1,10 +1,7 @@
-import sqlite3 as SQL_ENGINE
 from sqlite3.dbapi2 import *
 from typing import *
 
-from prmp_sql.statements import SELECT
-
-from .bases import Statement
+from prmp_sql import SELECT, SQL_ENGINE
 
 
 class _AggregateProtocol(Protocol):

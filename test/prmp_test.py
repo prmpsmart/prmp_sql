@@ -1,5 +1,5 @@
 import _pathy
-from prmp_sql.built_in_funtions import BIT_LENGTH, POSITION, TRIM_BOTH, TRIM_LEADING
+from prmp_sql.built_in_functions import BIT_LENGTH, POSITION, TRIM_BOTH, TRIM_LEADING
 from prmp_sql.modifiers import *
 from prmp_sql.constraints import *
 from prmp_sql.datatypes import *
