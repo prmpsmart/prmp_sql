@@ -1,7 +1,7 @@
-from sqlite3.dbapi2 import *
-from typing import *
-
-from prmp_sql import SELECT, SQL_ENGINE
+from .operators import LIMIT
+from .bases import sqlite3
+from .statements import *
+from .functions import *
 
 
 class _AggregateProtocol(Protocol):
@@ -13,32 +13,37 @@ class _AggregateProtocol(Protocol):
 
 
 class Wrapper:
-    DataError = SQL_ENGINE.Connection.DataError
-    DatabaseError = SQL_ENGINE.Connection.DatabaseError
-    Error = SQL_ENGINE.Connection.Error
-    IntegrityError = SQL_ENGINE.Connection.IntegrityError
-    InterfaceError = SQL_ENGINE.Connection.InterfaceError
-    InternalError = SQL_ENGINE.Connection.InternalError
-    NotSupportedError = SQL_ENGINE.Connection.NotSupportedError
-    OperationalError = SQL_ENGINE.Connection.OperationalError
-    ProgrammingError = SQL_ENGINE.Connection.ProgrammingError
-    Warning = SQL_ENGINE.Connection.Warning
+    DataError = sqlite3.Connection.DataError
+    DatabaseError = sqlite3.Connection.DatabaseError
+    Error = sqlite3.Connection.Error
+    IntegrityError = sqlite3.Connection.IntegrityError
+    InterfaceError = sqlite3.Connection.InterfaceError
+    InternalError = sqlite3.Connection.InternalError
+    NotSupportedError = sqlite3.Connection.NotSupportedError
+    OperationalError = sqlite3.Connection.OperationalError
+    ProgrammingError = sqlite3.Connection.ProgrammingError
+    Warning = sqlite3.Connection.Warning
 
-    CONNECT = SQL_ENGINE.connect
-    VALIDATE_STATEMENT = SQL_ENGINE.complete_statement
+    CONNECT = sqlite3.connect
+    VALIDATE_STATEMENT = sqlite3.complete_statement
 
-    def __init__(self, path, cursorClass: Union[type, None] = None) -> None:
+    def __init__(
+        self, path, cursorClass: Union[type, None] = None, init: bool = False, **kwargs
+    ) -> None:
         assert path, 'Path or ":memory: must be provided.'
 
         self.path = path
+        self.kwargs = kwargs
         self.__connection = None
-
         self.initialized = False
+
+        if init:
+            self.init()
 
     def init(self):
         if self.initialized:
             return
-        self.__connection = self.CONNECT(self.path)
+        self.__connection = self.CONNECT(self.path, **self.kwargs)
         self.initialized = True
 
     @property
@@ -70,7 +75,9 @@ class Wrapper:
         return self.__connection.total_changes
 
     def close(self) -> None:
-        return self.__connection.close()
+        if self.__connection:
+            self.initialized = False
+            return self.__connection.close()
 
     def commit(self) -> None:
         return self.__connection.commit()
@@ -88,17 +95,16 @@ class Wrapper:
     ) -> None:
         return self.__connection.create_function(name, narg, func, deterministic)
 
-    def execute(self, sql: str, parameters: Iterable[Any] = []) -> Cursor:
-        'returns a cursor object, which can be used to retrieve the values in case of SELECT statement.'
+    def execute(self, sql: str, parameters: Iterable[Any] = []) -> sqlite3.Cursor:
+        "returns a cursor object, which can be used to retrieve the values in case of SELECT statement."
         return self.__connection.execute(str(sql), parameters)
-
 
     def executemany(
         self, __sql: str, __parameters: Iterable[Iterable[Any]] = []
-    ) -> Cursor:
+    ) -> sqlite3.Cursor:
         return self.__connection.executemany(str(__sql), __parameters)
 
-    def executescript(self, __sql_script: Union[bytes, str]) -> Cursor:
+    def executescript(self, __sql_script: Union[bytes, str]) -> sqlite3.Cursor:
         return self.__connection.executescript(__sql_script)
 
     def interrupt(self, *args: Any, **kwargs: Any) -> None:
@@ -111,21 +117,77 @@ class Wrapper:
         return self.__connection.rollback(*args, **kwargs)
 
 
-class DataBase(Wrapper):
-    def __init__(self, path=":memory:") -> None:
-        Wrapper.__init__(self, path)
+class Database(Wrapper):
 
-    def execute_statement(self, statement: Statement, many=False, dry=False, quiet=False, parameters=[]):
+    SAVE = False
+    DEBUG = False
+
+    def __init__(self, path=":memory:", **kwargs) -> None:
+        Wrapper.__init__(self, path, **kwargs)
+
+    def execute_statement(
+        self,
+        statement: Statement,
+        parameters: list = [],
+        many: bool = False,
+        dry: bool = False,
+        quiet: bool = False,
+        quietError: bool = False,
+    ):
+        if not self.initialized:
+            print("Not Initialised")
+            return
+
         func = self.executemany if many else self.execute
-        if not quiet: print(statement)
+        if not quiet:
+            print(statement)
         try:
             if not dry:
                 assert isinstance(parameters, list)
-                res = func(statement, parameters)
-                # if isinstance(statement, SELECT): res = list(res)
+                res = func(str(statement), parameters)
                 return list(res)
         except Exception as e:
-            return str(e)
+            if not quietError:
+                raise e
+            return e
 
-    exec = execute_statement
-    
+    def exec(self, statement: Statement, query=False, debug=False) -> sqlite3.Cursor:
+        statement_ = str(statement)
+        if debug or self.DEBUG:
+            print(f"EXECUTE: {statement_}")
+
+        if self.initialized:
+            result = self.execute(statement_)
+            if self.SAVE and not query:
+                self.commit()
+            return result
+
+    def query(self, statement: Statement, debug=False) -> List[Dict[str, Any]]:
+        statement_ = str(statement)
+
+        if debug or self.DEBUG:
+            print(f"QUERY: {statement_}")
+        result = list(self.exec(statement, query=True) or [])
+        if debug or self.DEBUG:
+            print(f"QUERY_RESULT: {result}")
+
+        return result
+
+    def check_if_exists(self, table: str, where: WHERE) -> bool:
+        count_1 = COUNT(1)
+        select = SELECT(
+            count_1,
+            table,
+            where=where,
+            limit=LIMIT(1),
+        )
+
+        result = self.query(select)
+        value = False
+        if result:
+            value = result[0][0] != 0
+
+        return value
+
+    def REMOVE(self, table: str, where: WHERE):
+        self.exec(DELETE(table, where=where))

@@ -1,4 +1,4 @@
-
+import sqlite3
 
 
 class function:
@@ -18,8 +18,9 @@ class Base:
 
     def __add__(self, other):
         return f"{self} {other}"
-    
-    def __repr__(self): return self.__str__()
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class CONSTANT(Base):
@@ -51,8 +52,7 @@ class Name_Space_Base(Base):
 
 class Statement(Name_Space_Base):
     def __bool__(self):
-        import _sqlite3
-        ret = _sqlite3.complete_statement(str(self))
+        ret = sqlite3.complete_statement(str(self))
         return ret
 
     @property
@@ -108,7 +108,7 @@ class Column(Table):
 
 
 class Columns(Base):
-    def __init__(self, *columns, parenthesis=False) -> None:
+    def __init__(self, columns: list, parenthesis=False) -> None:
         self.columns = columns
         self.parenthesis = parenthesis
 
@@ -123,17 +123,41 @@ class Columns(Base):
         return text
 
 
+class New_Columns(Columns):
+    def __init__(self, args: list) -> None:
+        """
+        :args: instances of (Data_Type, Constraint, Modifier)
+        """
+        from .statements import Data_Type, Constraint, Modifier
+
+        allowed = (Data_Type, Constraint, Modifier)
+        columns = []
+        for arg in args:
+            if isinstance(arg, allowed):
+                columns.append(arg)
+            else:
+                raise Exception(
+                    f"args must be instances or subclasses of {[a.__name__ for a in allowed]}, not {type(arg).__name__}"
+                )
+
+        super().__init__(columns, parenthesis=True)
+
+
+NCs = New_Columns
+
+
 class VALUES(Columns):
-    def __init__(self, *values, insert=True) -> None:
+    def __init__(self, values: list, insert=True) -> None:
         _columns = []
         if insert:
             for column in values:
-                
+
                 if isinstance(column, str):
                     _columns.append(CONSTANT(column))
-                else: _columns.append(column)
+                else:
+                    _columns.append(column)
 
-        super().__init__(*_columns, parenthesis=True)
+        super().__init__(_columns, parenthesis=True)
 
     @property
     def string(self):
@@ -144,7 +168,7 @@ class VALUES(Columns):
 
 
 class MULTI_VALUES:
-    def __init__(self, *values) -> None:
+    def __init__(self, values: list) -> None:
         for val in values:
             assert isinstance(
                 val, (Columns, tuple)

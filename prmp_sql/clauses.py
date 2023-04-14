@@ -1,4 +1,4 @@
-from .operators import EQUAL
+from .operators import EQUAL, Operator
 from .bases import Name_Space_Base, Columns, CONSTANT, Column
 
 
@@ -19,7 +19,8 @@ class FROM(Clause):
 
 
 class WHERE(Clause):
-    def __init__(self, search_condition) -> None:
+    def __init__(self, search_condition: Operator) -> None:
+        assert isinstance(search_condition, Operator)
         super().__init__(search_condition)
 
 
@@ -41,7 +42,7 @@ class ORDER_BY(Clause):
 
 
 class SET(Clause):
-    def __init__(self, *values, columns=[]) -> None:
+    def __init__(self, values, columns=[]) -> None:
         """
         :values: tuple, list of length 2, or instance of EQUAL
         """
@@ -72,7 +73,7 @@ class SET(Clause):
                     equal.parenthesis = False
                     columns.append(equal)
 
-                expression = Columns(*columns)
+                expression = Columns(columns)
 
         super().__init__(expression)
 

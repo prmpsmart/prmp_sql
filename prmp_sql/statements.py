@@ -1,9 +1,10 @@
+from typing import *
 from .modifiers import Modifier
 from .constraints import Constraint
 from .datatypes import Data_Type
 from .functions import Function, One_Value
 from .clauses import FROM, GROUP_BY, HAVING, ORDER_BY, WHERE, Clause, SET
-from .bases import MULTI_VALUES, VALUES, Base, Column, Columns, Statement, Table
+from .bases import MULTI_VALUES, VALUES, Column, New_Columns, Columns, Statement, Table
 from .operators import AS, INTO, TO
 
 
@@ -16,7 +17,7 @@ class SELECT(Statement):
         self,
         columns,
         from_,
-        where=None,
+        where: WHERE = None,
         group=None,
         having=None,
         order=None,
@@ -89,7 +90,12 @@ class SELECT(Statement):
 
 
 class INSERT(Statement):
-    def __init__(self, table, columns=None, values=()) -> None:
+    def __init__(
+        self,
+        table: Union[str, Table],
+        columns: Columns = None,
+        values: Union[VALUES, MULTI_VALUES] = (),
+    ) -> None:
         if columns:
             assert type(columns) == Columns
             columns.parenthesis = True
@@ -112,7 +118,7 @@ class INSERT(Statement):
 
 
 class UPDATE(Statement):
-    def __init__(self, table, set: SET, where: WHERE=None) -> None:
+    def __init__(self, table, set: SET, where: WHERE = None) -> None:
         self.table = table
         assert isinstance(set, SET)
         self.set = set
@@ -128,7 +134,7 @@ class UPDATE(Statement):
 
 
 class DELETE(Statement):
-    def __init__(self, table, where=None) -> None:
+    def __init__(self, table, where: WHERE = None) -> None:
         self.table = table
         self.where = where
 
@@ -153,42 +159,25 @@ class TRUNCATE_TABLE(One_Line):
     ...
 
 
-class New_Columns(Columns):
-    def __init__(self, *args) -> None:
-        """
-        :args: instances of (Data_Type, Constraint, Modifier)
-        """
-        allowed = (Data_Type, Constraint, Modifier)
-        columns = []
-        for arg in args:
-            if isinstance(arg, allowed):
-                columns.append(arg)
-            else:
-                raise Exception(f"args must be instances {allowed}")
-
-        super().__init__(*columns, parenthesis=True)
-
-
-NCs = New_Columns
-
-
 class CREATE(One_Line):
     ...
 
 
 class CREATE_TABLE(CREATE):
-    def __init__(self, table, *new_columns: New_Columns, check_exist=False) -> None:
+    def __init__(
+        self, table, new_columns: Union[New_Columns, list], check_exist=False
+    ) -> None:
         assert new_columns
 
         if len(new_columns) == 1 and isinstance(new_columns[0], New_Columns):
             new_columns = new_columns[0]
         else:
-            new_columns = New_Columns(*new_columns)
+            new_columns = New_Columns(new_columns)
 
         assert isinstance(new_columns, New_Columns)
-        exist = 'IF NOT EXISTS' if check_exist else ''
+        exist = "IF NOT EXISTS " if check_exist else ""
 
-        expression = f"{exist} {table} {new_columns}"
+        expression = f"{exist}{table} {new_columns}"
         super().__init__(expression)
 
 
@@ -200,76 +189,6 @@ class CREATE_VIEW(CREATE):
     def __init__(self, view, select) -> None:
         assert isinstance(select, SELECT), f"select must be an instance of {SELECT}"
         expression = AS(view, select)
-        super().__init__(expression)
-
-
-class ADD_COLUMN(One_Line):
-    def __init__(self, *values) -> None:
-        """
-        :values: value in values can be a [str, Column, tuple, list, New_Column].
-        when value is a tuple or list, it must be of length 2, (column_name, datatype)
-        """
-        expression = None
-
-        if values:
-            l = len(values)
-            ll = [type(value) for value in values]
-            if Columns in ll or New_Columns in ll:
-                assert l == 1, "Only one Columns object should be passed."
-                expression = values[0]
-        if not expression:
-            columns = []
-            for value in values:
-                col = None
-                if isinstance(value, (str, Column)):
-                    col = value
-
-                else:
-                    raise Exception("Value not supported.")
-
-                columns.append(col)
-
-                expression = New_Columns(*columns)
-        if not expression:
-            raise Exception("Expression is not determined")
-
-        super().__init__(expression)
-
-
-class ALTER_COLUMN(ADD_COLUMN):
-    ...
-
-
-class DROP_COLUMN(One_Line):
-    def __init__(self, *values) -> None:
-        """
-        :values: value in values can be a [str, Column, tuple, list, New_Column].
-        when value is a tuple or list, it must be of length 2, (column_name, datatype)
-        """
-        expression = None
-
-        if values:
-            l = len(values)
-            ll = [type(value) for value in values]
-            if Columns in ll:
-                assert l == 1, "Only one Columns object should be passed."
-                expression = values[0]
-        if not expression:
-            columns = []
-            for value in values:
-                col = None
-                if isinstance(value, (str, Column)):
-                    col = value
-
-                else:
-                    raise Exception("Value not supported.")
-
-                columns.append(col)
-
-                expression = Columns(*columns)
-        if not expression:
-            raise Exception("Expression is not determined")
-
         super().__init__(expression)
 
 

@@ -7,7 +7,9 @@ class Operator(Base):
     LTR = True
     parenthesis = True
 
-    def __init__(self, operator, first, second=None, parenthesis=None, constant=False) -> None:
+    def __init__(
+        self, operator, first, second=None, parenthesis=None, constant=False
+    ) -> None:
         """
         :operator: Operator value can not be [None, 0]
         :first: First value can not be [None, Empty string, 0]
@@ -17,13 +19,14 @@ class Operator(Base):
         if isinstance(second, SELECT):
             second.parenthesis = True
 
-        if parenthesis!=None: self.parenthesis =parenthesis
+        if parenthesis != None:
+            self.parenthesis = parenthesis
         self.operator = operator
         self.first = first
         self.second = second if not constant else CONSTANT(second)
 
     def __str__(self) -> str:
-        ln = [self.first==None, self.second==None].count(False)
+        ln = [self.first == None, self.second == None].count(False)
         text = ""
 
         if ln == 1:
